@@ -1,0 +1,2822 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Informe Ecocardiograma de Estrés</title>
+<style>
+  :root{--bg:#0f1117;--surface:#171b26;--surface2:#1e2332;--surface3:#252a3a;--border:#2d3348;--border2:#3a4060;--accent:#4f9cf9;--accent2:#3b82f6;--green:#22c55e;--green-bg:rgba(34,197,94,.08);--yellow:#eab308;--yellow-bg:rgba(234,179,8,.08);--red:#ef4444;--red-bg:rgba(239,68,68,.08);--text:#e2e8f0;--text2:#94a3b8;--text3:#64748b;--radius:6px;--font:-apple-system,BlinkMacSystemFont,'Segoe UI','Helvetica Neue',Arial,sans-serif;--mono:'SF Mono','Fira Code','Consolas','Courier New',monospace}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:13px;line-height:1.5;min-height:100vh}
+  .app-header{background:var(--surface);border-bottom:1px solid var(--border);padding:10px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+  .app-logo{display:flex;align-items:center;gap:10px}
+  .app-logo-text{font-size:13px;font-weight:600;color:var(--text)}
+  .app-logo-sub{font-size:11px;color:var(--text3);font-weight:300}
+  .header-actions{display:flex;gap:8px;align-items:center}
+  .app-body{display:grid;grid-template-columns:220px 1fr;min-height:calc(100vh - 53px)}
+  .sidebar{background:var(--surface);border-right:1px solid var(--border);padding:14px 0;position:sticky;top:53px;height:calc(100vh - 53px);overflow-y:auto}
+  .sidebar::-webkit-scrollbar{width:4px}
+  .sidebar::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+  .nav-section-label{padding:4px 16px 5px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--text3)}
+  .nav-item{display:flex;align-items:center;gap:8px;padding:6px 16px;cursor:pointer;color:var(--text2);font-size:12px;border-left:2px solid transparent;transition:all .15s;text-decoration:none}
+  .nav-item:hover{background:var(--surface2);color:var(--text)}
+  .nav-item.active{background:rgba(79,156,249,.08);color:var(--accent);border-left-color:var(--accent);font-weight:500}
+  .nav-dot{width:6px;height:6px;border-radius:50%;background:var(--border2);flex-shrink:0}
+  .nav-divider{height:1px;background:var(--border);margin:7px 0}
+  .main-content{padding:20px;overflow-y:auto;max-width:1100px}
+  .section-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;margin-bottom:14px;overflow:hidden}
+  .section-header{display:flex;align-items:center;justify-content:space-between;padding:11px 16px;cursor:pointer;user-select:none;background:var(--surface2);border-bottom:1px solid var(--border);transition:background .15s}
+  .section-header:hover{background:var(--surface3)}
+  .section-title-row{display:flex;align-items:center;gap:10px}
+  .section-num{font-family:var(--mono);font-size:10px;color:var(--text3);background:var(--surface3);padding:2px 6px;border-radius:3px;min-width:26px;text-align:center}
+  .section-title{font-size:13px;font-weight:600;color:var(--text)}
+  .section-badge{font-size:10px;padding:1px 7px;border-radius:20px;font-weight:500}
+  .badge-normal{background:var(--green-bg);color:var(--green)}
+  .badge-warn{background:var(--yellow-bg);color:var(--yellow)}
+  .badge-alert{background:var(--red-bg);color:var(--red)}
+  .badge-empty{background:var(--surface3);color:var(--text3)}
+  .section-chevron{color:var(--text3);transition:transform .2s;font-size:12px}
+  .section-card.collapsed .section-chevron{transform:rotate(-90deg)}
+  .section-card.collapsed .section-body{display:none}
+  .section-body{padding:16px}
+  .field-grid{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));margin-bottom:12px}
+  .field-grid-2{grid-template-columns:repeat(2,1fr)}
+  .field-grid-3{grid-template-columns:repeat(3,1fr)}
+  .field-grid-4{grid-template-columns:repeat(4,1fr)}
+  .field-grid-6{grid-template-columns:repeat(6,1fr)}
+  .field-group{display:flex;flex-direction:column;gap:3px}
+  .field-label{font-size:10px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.04em}
+  .field-input-wrap{position:relative}
+  .field-input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:var(--mono);font-size:13px;padding:6px 10px;outline:none;transition:border-color .15s,background .15s}
+  .field-input:focus{border-color:var(--accent);background:var(--surface3)}
+  .field-input.status-normal{border-color:rgba(34,197,94,.4);background:var(--green-bg)}
+  .field-input.status-warn{border-color:rgba(234,179,8,.4);background:var(--yellow-bg)}
+  .field-input.status-alert{border-color:rgba(239,68,68,.4);background:var(--red-bg)}
+  .field-unit{position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:10px;color:var(--text3);pointer-events:none}
+  .field-status-text{font-size:10px;margin-top:2px}
+  .status-normal-txt{color:var(--green)}
+  .status-warn-txt{color:var(--yellow)}
+  .status-alert-txt{color:var(--red)}
+  .field-select{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:var(--font);font-size:13px;padding:6px 10px;outline:none;cursor:pointer;transition:border-color .15s}
+  .field-select:focus{border-color:var(--accent)}
+  .field-textarea{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:var(--font);font-size:12px;padding:8px 12px;outline:none;resize:vertical;min-height:80px;line-height:1.6;transition:border-color .15s}
+  .field-textarea:focus{border-color:var(--accent)}
+  .calc-value{background:rgba(79,156,249,.06);border:1px solid rgba(79,156,249,.2);border-radius:var(--radius);padding:6px 10px;font-family:var(--mono);font-size:13px;color:var(--accent);display:flex;align-items:center;min-height:32px}
+  .subsection-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);border-bottom:1px solid var(--border);padding-bottom:5px;margin-bottom:11px;margin-top:15px}
+  .subsection-title:first-child{margin-top:0}
+  .derived-panel{background:rgba(79,156,249,.04);border:1px solid rgba(79,156,249,.12);border-radius:var(--radius);padding:10px 14px;margin-bottom:12px;display:flex;flex-wrap:wrap;gap:12px}
+  .derived-item{display:flex;flex-direction:column;gap:2px}
+  .derived-item-label{font-size:10px;color:var(--text3);text-transform:uppercase}
+  .derived-item-val{font-family:var(--mono);font-size:13px;color:var(--accent);font-weight:500}
+  .preformat-bar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;align-items:center}
+  .preformat-label{font-size:10px;color:var(--text3);font-weight:500;text-transform:uppercase;letter-spacing:.04em}
+  .preformat-btn{font-family:var(--font);font-size:11px;font-weight:500;padding:4px 10px;border-radius:20px;border:1px solid var(--border2);background:var(--surface3);color:var(--text2);cursor:pointer;transition:all .15s}
+  .preformat-btn:hover{background:var(--surface2);color:var(--text);border-color:var(--accent)}
+  .pf-normal{border-color:rgba(34,197,94,.3);color:var(--green)}.pf-normal:hover{background:var(--green-bg)}
+  .pf-leve{border-color:rgba(234,179,8,.3);color:var(--yellow)}.pf-leve:hover{background:var(--yellow-bg)}
+  .pf-moderado{border-color:rgba(249,115,22,.3);color:#f97316}.pf-moderado:hover{background:rgba(249,115,22,.08)}
+  .pf-severo{border-color:rgba(239,68,68,.3);color:var(--red)}.pf-severo:hover{background:var(--red-bg)}
+  .btn{font-family:var(--font);font-size:12px;font-weight:500;padding:7px 16px;border-radius:var(--radius);border:none;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
+  .btn-primary{background:var(--accent2);color:#fff}.btn-primary:hover{background:var(--accent)}
+  .btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border2)}.btn-ghost:hover{background:var(--surface3);color:var(--text)}
+  .btn-lg{padding:9px 22px;font-size:13px}
+  .conclusions-section{background:var(--surface);border:1px solid var(--accent2);border-radius:8px;padding:18px;margin-top:14px}
+  .conclusions-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+  .conclusions-title{font-size:15px;font-weight:700;color:var(--accent);display:flex;align-items:center;gap:8px}
+  .hp-check-label{display:flex;align-items:center;gap:8px;cursor:pointer;padding:7px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);font-size:12px;transition:border-color .15s}
+  .hp-check-label:hover{border-color:var(--accent)}
+  .hp-check-label input{accent-color:var(--accent)}
+  .action-bar{display:flex;gap:8px;padding:14px 24px;background:var(--surface);border-top:1px solid var(--border);position:sticky;bottom:0;z-index:50}
+  .mt-8{margin-top:8px}.mt-12{margin-top:12px}
+  input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
+  input[type=number]{-moz-appearance:textfield}
+  ::-webkit-scrollbar{width:6px;height:6px}
+  ::-webkit-scrollbar-track{background:var(--bg)}
+  ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+  .print-header{display:none}
+  @media print{
+    *{box-sizing:border-box}
+    body{background:#fff!important;color:#000!important;font-family:'Times New Roman',serif;font-size:11pt;line-height:1.5;margin:0;padding:0}
+    .app-header,.sidebar,.action-bar,.preformat-bar,.preformat-label,.btn,.section-chevron,.field-status-text,.derived-panel,.no-print{display:none!important}
+    .app-body{display:block!important}
+    .main-content{padding:0!important;max-width:100%!important}
+    .print-header{display:block!important;margin-bottom:14pt}
+    .section-card{background:#fff!important;border:none!important;margin-bottom:10pt!important;page-break-inside:avoid}
+    .section-card.collapsed .section-body{display:block!important}
+    .section-body{padding:0!important}
+    .section-header{display:none!important}
+    .print-section-title{font-size:11pt;font-weight:bold;border-bottom:1pt solid #888;padding-bottom:3pt;margin-bottom:5pt;text-transform:uppercase;letter-spacing:.04em}
+    .field-grid,.field-grid-2,.field-grid-3,.field-grid-4,.field-grid-6{display:flex!important;flex-wrap:wrap!important;gap:4pt!important;margin-bottom:5pt!important}
+    .field-group{min-width:90pt}
+    .field-label{font-size:8pt;font-weight:bold;color:#555}
+    .field-input,.field-select{background:#fff!important;border:none!important;color:#000!important;font-family:inherit!important;font-size:11pt!important;padding:0!important}
+    .field-textarea{background:#fff!important;border:none!important;color:#000!important;font-family:'Times New Roman',serif!important;font-size:11pt!important;padding:0!important;resize:none!important;height:auto!important;min-height:auto!important;overflow:hidden!important}
+    .calc-value{background:none!important;border:none!important;color:#000!important;font-size:11pt!important;padding:0!important}
+    .conclusions-section{background:#fff!important;border:1pt solid #000!important;padding:8pt!important}
+    .conclusions-title{color:#000!important;font-size:12pt!important}
+    #conclusionesText{background:#fff!important;border:none!important;color:#000!important;font-size:11pt!important}
+    .subsection-title{color:#333!important;border-color:#aaa!important;font-size:9pt!important}
+    .hp-check-label{background:#fff!important;border:none!important;font-size:10pt!important;padding:1pt 0!important}
+    /* Strain: ocultar sección completa si no hay texto */
+    .print-hidden{display:none!important}
+    /* Strain: mostrar solo el bloque de texto interpretativo */
+    .print-strain-only .section-body > *:not(.print-section-title):not(#str_texto){display:none!important}
+    .print-strain-only .section-body > #str_texto{display:block!important;background:#fff!important;border:none!important;color:#000!important;font-family:'Times New Roman',serif!important;font-size:11pt!important;padding:0!important;resize:none!important;height:auto!important;min-height:auto!important;overflow:hidden!important}
+  }
+
+  /* ── PRINT REPORT LAYOUT ─────────────────────────────────────── */
+  #pr-layout { display:none }
+  @media print {
+    body > *:not(#pr-layout) { display:none !important }
+    #pr-layout {
+      display:block !important;
+      font-family:'Times New Roman', serif;
+      font-size:9.5pt;
+      color:#000;
+      margin:0;
+      padding:0;
+    }
+
+    /* Header */
+    .pr-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:5pt }
+    .pr-logo { height:54pt; width:auto }
+    .pr-header-right { text-align:right }
+    .pr-report-title { font-size:14pt; font-weight:bold; color:#1a5f7a; letter-spacing:.03em }
+    .pr-doctor { font-size:10pt; color:#1a5f7a; font-weight:600 }
+    .pr-line { border:0; border-top:1.5pt solid #1a5f7a; margin:4pt 0 6pt }
+    .pr-patient-row { display:flex; flex-wrap:wrap; gap:4pt 16pt; font-size:9pt; margin-bottom:4pt }
+    .pr-patient-row span { white-space:nowrap }
+
+    /* Two-column body */
+    .pr-body { display:flex; gap:14pt; align-items:flex-start; margin-bottom:8pt }
+    .pr-col-table { flex:0 0 auto; width:195pt }
+    .pr-col-text  { flex:1 1 0 }
+
+    /* Numeric table */
+    .pr-table { width:100%; border-collapse:collapse; font-size:8.5pt }
+    .pr-table td { padding:1.4pt 4pt; vertical-align:top; line-height:1.35 }
+    .pr-thead td { background:#1a5f7a; color:#fff; font-weight:bold; font-size:7.5pt;
+                   text-transform:uppercase; letter-spacing:.04em; padding:2pt 4pt }
+    .pr-label { color:#333; width:55% }
+    .pr-val   { font-weight:600; color:#000; width:45% }
+    .pr-unit  { font-weight:400; color:#555; font-size:7.5pt }
+    .pr-table tr:nth-child(even):not(.pr-thead) td { background:#f5f7fa }
+
+    /* Text blocks */
+    .pr-text-block { margin-bottom:7pt; page-break-inside:avoid }
+    .pr-text-title { font-size:9pt; font-weight:bold; text-transform:uppercase;
+                     letter-spacing:.05em; border-bottom:.5pt solid #aaa;
+                     padding-bottom:2pt; margin-bottom:3pt; color:#1a5f7a }
+    .pr-text-body  { font-size:9.5pt; line-height:1.55; text-align:justify }
+
+    /* Conclusions */
+    .pr-conclusions { border:1pt solid #1a5f7a; border-radius:3pt; padding:6pt 8pt;
+                      page-break-inside:avoid; margin-top:4pt }
+    .pr-conc-title  { font-size:10pt; font-weight:bold; color:#1a5f7a; margin-bottom:4pt }
+    .pr-conc-body   { font-size:9.5pt; line-height:1.6; text-align:justify }
+  }
+
+  /* ── VOICE RECOGNITION ─────────────────────────────────────── */
+  .mic-btn {
+    position:absolute; right:2px; top:50%; transform:translateY(-50%);
+    width:22px; height:22px; border-radius:50%; border:none; cursor:pointer;
+    background:transparent; color:var(--text3); font-size:12px;
+    display:flex; align-items:center; justify-content:center;
+    transition:all .15s; z-index:2; padding:0;
+  }
+  .mic-btn:hover { color:var(--accent); background:rgba(79,156,249,.1); }
+  .mic-btn.listening {
+    color:#fff !important; background:var(--red) !important;
+    animation: mic-pulse 1s ease-in-out infinite;
+  }
+  @keyframes mic-pulse {
+    0%,100% { box-shadow: 0 0 0 0 rgba(239,68,68,.4); }
+    50%      { box-shadow: 0 0 0 6px rgba(239,68,68,0); }
+  }
+  /* Shift field-unit left when mic present */
+  .has-mic .field-unit { right:26px; }
+
+  /* Voice toast */
+  #voice-toast {
+    position:fixed; bottom:70px; left:50%; transform:translateX(-50%);
+    background:rgba(15,17,23,.95); border:1px solid var(--border2);
+    border-radius:8px; padding:10px 18px; font-size:12px; color:var(--text);
+    display:none; z-index:1000; gap:10px; align-items:center;
+    box-shadow:0 4px 24px rgba(0,0,0,.4); min-width:260px;
+  }
+  #voice-toast.show { display:flex; }
+  #voice-toast .vt-icon { font-size:18px; }
+  #voice-toast .vt-label { color:var(--text3); font-size:11px; }
+  #voice-toast .vt-value { color:var(--accent); font-weight:600; font-size:14px; font-family:var(--mono); }
+
+  /* Global voice button */
+  #voice-global-btn {
+    position:fixed; right:20px; bottom:80px; z-index:200;
+    width:48px; height:48px; border-radius:50%; border:none; cursor:pointer;
+    background:var(--surface2); border:1px solid var(--border2);
+    color:var(--text2); font-size:20px;
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 4px 16px rgba(0,0,0,.3); transition:all .2s;
+  }
+  #voice-global-btn:hover { background:var(--surface3); color:var(--text); }
+  #voice-global-btn.active { background:var(--red); color:#fff; border-color:var(--red);
+    animation: mic-pulse 1s ease-in-out infinite; }
+  #voice-global-btn .vgb-tip {
+    position:absolute; right:56px; white-space:nowrap;
+    background:var(--surface); border:1px solid var(--border2);
+    padding:4px 10px; border-radius:4px; font-size:11px; color:var(--text2);
+    opacity:0; pointer-events:none; transition:opacity .2s;
+  }
+  #voice-global-btn:hover .vgb-tip { opacity:1; }
+
+
+  /* ── CONFIGURACIÓN MÉDICO ───────────────────────────────────── */
+  #config-modal-overlay {
+    position:fixed; inset:0; background:rgba(0,0,0,.7); z-index:2000;
+    display:flex; align-items:center; justify-content:center;
+  }
+  #config-modal-overlay.hidden { display:none; }
+  #config-modal {
+    background:var(--surface); border:1px solid var(--border2);
+    border-radius:12px; padding:32px; width:480px; max-width:95vw;
+    box-shadow:0 16px 48px rgba(0,0,0,.5);
+  }
+  #config-modal h2 {
+    font-size:16px; font-weight:700; color:var(--text); margin-bottom:6px;
+  }
+  #config-modal p.subtitle {
+    font-size:12px; color:var(--text3); margin-bottom:24px; line-height:1.5;
+  }
+  .config-field { margin-bottom:16px; }
+  .config-field label {
+    display:block; font-size:11px; font-weight:600; color:var(--text3);
+    text-transform:uppercase; letter-spacing:.04em; margin-bottom:5px;
+  }
+  .config-field input[type="text"] {
+    width:100%; background:var(--surface2); border:1px solid var(--border);
+    border-radius:var(--radius); color:var(--text); font-size:13px;
+    padding:8px 12px; outline:none; transition:border-color .15s; box-sizing:border-box;
+  }
+  .config-field input[type="text"]:focus { border-color:var(--accent); }
+  .config-logo-area {
+    display:flex; align-items:center; gap:14px; margin-top:6px;
+  }
+  #config-logo-preview {
+    width:80px; height:60px; object-fit:contain;
+    background:var(--surface2); border:1px solid var(--border);
+    border-radius:var(--radius); display:flex; align-items:center;
+    justify-content:center; color:var(--text3); font-size:11px;
+    flex-shrink:0; overflow:hidden;
+  }
+  #config-logo-preview img { max-width:100%; max-height:100%; object-fit:contain; }
+  .config-logo-btns { display:flex; flex-direction:column; gap:6px; }
+  .config-logo-btns button {
+    font-family:var(--font); font-size:11px; font-weight:500;
+    padding:5px 12px; border-radius:var(--radius); border:1px solid var(--border2);
+    background:var(--surface3); color:var(--text2); cursor:pointer; transition:all .15s;
+    text-align:left;
+  }
+  .config-logo-btns button:hover { background:var(--surface2); color:var(--text); }
+  .config-logo-btns button.btn-remove { color:var(--red); border-color:rgba(239,68,68,.3); }
+  .config-modal-actions { display:flex; gap:8px; margin-top:24px; justify-content:flex-end; }
+  /* Settings gear in header */
+  #config-gear-btn {
+    background:transparent; border:1px solid var(--border2); border-radius:var(--radius);
+    color:var(--text3); font-size:14px; padding:5px 9px; cursor:pointer;
+    transition:all .15s; line-height:1;
+  }
+  #config-gear-btn:hover { background:var(--surface3); color:var(--text); }
+
+
+/* ── CONFIGURACIÓN MÉDICO ───────────────────────────────────── */
+  #config-modal-overlay {
+    position:fixed; inset:0; background:rgba(0,0,0,.7); z-index:2000;
+    display:flex; align-items:center; justify-content:center;
+  }
+
+
+.stress-badge{background:linear-gradient(135deg,#059669,#10b981);color:#fff;font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;letter-spacing:.06em;margin-left:6px;}
+.stage-tabs{display:flex;gap:4px;margin-bottom:12px;flex-wrap:wrap;}
+.stage-tab{padding:5px 14px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--border2);background:var(--surface2);color:var(--text3);transition:all .15s;user-select:none;}
+.stage-tab.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+.stage-tab:hover:not(.active){background:var(--surface3);color:var(--text);}
+.stage-panel{display:none;}.stage-panel.active{display:block;}
+.stage-header{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:8px;background:var(--surface2);margin-bottom:10px;border-left:3px solid var(--accent);}
+.stage-header-label{font-size:12px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.05em;}
+.stage-hr-bp{display:flex;gap:12px;margin-left:auto;flex-wrap:wrap;}
+.stage-vitals-item{font-size:11px;color:var(--text3);}
+.vitals-input{width:48px;background:transparent;border:none;border-bottom:1px solid var(--border2);color:var(--text);font-size:11px;text-align:center;outline:none;}
+.vitals-input-bp{width:68px;background:transparent;border:none;border-bottom:1px solid var(--border2);color:var(--text);font-size:11px;text-align:center;outline:none;}
+.wm-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin:8px 0;}
+.wm-segment{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:4px 6px;}
+.wm-seg-name{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px;}
+.wm-seg-select{width:100%;background:transparent;border:none;color:var(--text);font-size:10px;font-family:var(--font);cursor:pointer;outline:none;padding:0;}
+.wm-segment.wm-normal{border-color:var(--border);}
+.wm-segment.wm-hipo{border-color:#f59e0b;background:rgba(245,158,11,.08);}
+.wm-segment.wm-aki{border-color:#ef4444;background:rgba(239,68,68,.08);}
+.wm-segment.wm-dis{border-color:#8b5cf6;background:rgba(139,92,246,.08);}
+.wm-segment.wm-bif{border-color:#10b981;background:rgba(16,185,129,.12);}
+</style>
+</head>
+<body>
+<!-- ── MODAL CONFIGURACIÓN MÉDICO ── -->
+<div id="config-modal-overlay" class="hidden">
+  <div id="config-modal">
+    <h2>⚙️ Configuración del médico</h2>
+    <p class="subtitle">Esta información aparecerá en el encabezado de todos sus informes.<br>Se guarda en este navegador y no se envía a ningún servidor.</p>
+
+    <div class="config-field">
+      <label>Nombre completo (con título)</label>
+      <input type="text" id="cfg-name" placeholder="Dr. Nombre Apellido">
+    </div>
+    <div class="config-field">
+      <label>Especialidad / Subtítulo</label>
+      <input type="text" id="cfg-specialty" placeholder="Cardiólogo · Informe Ecocardiográfico">
+    </div>
+    <div class="config-field">
+      <label>Logo / Firma</label>
+      <div class="config-logo-area">
+        <div id="config-logo-preview"><span id="cfg-logo-placeholder">Sin logo</span></div>
+        <div class="config-logo-btns">
+          <button onclick="document.getElementById('cfg-logo-input').click()">📁 Cargar imagen...</button>
+          <button class="btn-remove" onclick="removeLogo()" id="cfg-remove-btn" style="display:none">✕ Quitar logo</button>
+          <span style="font-size:10px;color:var(--text3);line-height:1.4;">PNG, JPG o SVG<br>Recomendado: fondo transparente</span>
+        </div>
+      </div>
+      <input type="file" id="cfg-logo-input" accept="image/*" style="display:none" onchange="handleLogoUpload(event)">
+    </div>
+
+    <div class="config-modal-actions">
+      <button class="btn btn-ghost" onclick="closeConfig()" id="cfg-cancel-btn">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveConfig()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<div class="action-bar no-print">
+  <button class="btn btn-primary btn-lg" onclick="exportPDF()">⬇ Exportar PDF</button>
+  <button class="btn btn-ghost" onclick="generateConclusions()">⚡ Generar conclusiones</button>
+  <button class="btn btn-ghost" onclick="clearAll()">🗑 Nuevo informe</button>
+</div>
+
+
+</body>
+</html
+<header class="app-header">
+  <div class="app-logo">
+    <img id="config-logo-img" src="" style="height:42px;width:auto;display:block;" alt="Logo">
+    <div><div class="app-logo-text" id="config-name-display"></div><div class="app-logo-sub" id="config-specialty-display"></div></div>
+  </div>
+  <div class="header-actions">
+    <a href="index.html" style="background:transparent;border:1px solid var(--border2);border-radius:var(--radius);color:var(--text3);font-size:12px;padding:5px 10px;text-decoration:none;display:inline-flex;align-items:center;gap:4px;transition:all .15s;">← Inicio</a>
+    <button id="config-gear-btn" onclick="openConfig()" title="Configurar">⚙️</button>
+    <span style="font-size:11px;color:#10b981;font-weight:600;padding:4px 8px;border:1px solid rgba(16,185,129,.4);border-radius:6px;">ESTRÉS</span>
+  </div>
+</header>
+<div id="voice-toast"><span class="vt-icon">🎙</span><div><div class="vt-label" id="vt-field-name">Escuchando...</div><div class="vt-value" id="vt-interim">—</div></div></div>
+<button id="voice-global-btn" onclick="toggleGlobalVoice()" title="Dictado">🎙 <span class="vgb-tip">Dictado</span></button>
+<div class="action-bar no-print">
+  <button class="btn btn-primary btn-lg" onclick="exportPDF()">⬇ Exportar PDF</button>
+  <button class="btn btn-ghost" onclick="clearAll()">🗑 Nuevo informe</button>
+</div>
+<div style="max-width:960px;margin:0 auto;padding:0 16px 100px;">
+
+<div class="section-card" id="s0">
+  <div class="section-header" onclick="toggleSection('s0')">
+    <div class="section-title-row">
+      <span class="section-num">01</span>
+      <span class="section-title">Datos del Paciente</span>
+      <span class="section-badge badge-empty" id="badge-s0">—</span>
+    </div>
+    <span class="section-chevron">▾</span>
+  </div>
+  <div class="section-body">
+
+    <div class="field-grid field-grid-3">
+      <div class="field-group" style="grid-column:span 2;"><label class="field-label">Nombre completo</label>
+        <input type="text" class="field-input" id="p_nombre" placeholder="Apellido, Nombre" oninput="updatePatientDisplay()"></div>
+      <div class="field-group"><label class="field-label">Fecha del estudio</label>
+        <input type="date" class="field-input" id="p_fecha" oninput="updatePatientDisplay()"></div>
+    </div>
+    <div class="field-grid field-grid-3">
+      <div class="field-group"><label class="field-label">Tipo ID</label>
+        <select class="field-select" id="p_id_tipo" onchange="updatePatientDisplay()">
+          <option value="">—</option><option value="CC">CC</option><option value="CE">CE</option>
+          <option value="PA">PA</option><option value="TI">TI</option><option value="OT">Otro</option>
+        </select></div>
+      <div class="field-group" style="grid-column:span 2;"><label class="field-label">Número de identificación</label>
+        <input type="text" class="field-input" id="p_id_num" placeholder="Número" oninput="updatePatientDisplay()"></div>
+    </div>
+    <div class="field-grid field-grid-6">
+      <div class="field-group"><label class="field-label">Edad</label>
+        <div class="field-input-wrap"><input type="number" class="field-input" id="p_edad" placeholder="--" oninput="updatePatientDisplay();calcFCMax()"><span class="field-unit">años</span></div></div>
+      <div class="field-group"><label class="field-label">Sexo</label>
+        <select class="field-select" id="p_sexo" onchange="updatePatientDisplay()">
+          <option value="">—</option><option value="M">Masculino</option><option value="F">Femenino</option></select></div>
+      <div class="field-group"><label class="field-label">Peso</label>
+        <div class="field-input-wrap"><input type="number" class="field-input" id="p_peso" placeholder="--" oninput="calcSC()"><span class="field-unit">kg</span></div></div>
+      <div class="field-group"><label class="field-label">Talla</label>
+        <div class="field-input-wrap"><input type="number" class="field-input" id="p_talla" placeholder="--" oninput="calcSC()"><span class="field-unit">cm</span></div></div>
+      <div class="field-group"><label class="field-label">SC</label><div class="calc-value" id="sc_val">— m²</div></div>
+      <div class="field-group"><label class="field-label">FC máx. pred.</label><div class="calc-value" id="fc_max_val">— lpm</div></div>
+    </div>
+    <div class="field-grid field-grid-2" style="margin-top:8px;">
+      <div class="field-group"><label class="field-label">Indicación</label>
+        <input type="text" class="field-input" id="p_indicacion" placeholder="Dolor torácico, disnea, preoperatorio..."></div>
+      <div class="field-group"><label class="field-label">Solicitante</label>
+        <input type="text" class="field-input" id="p_solicitante" placeholder="Dr. Nombre"></div>
+    </div>
+  </div>
+</div>
+
+<div class="section-card" id="s1">
+  <div class="section-header" onclick="toggleSection('s1')">
+    <div class="section-title-row">
+      <span class="section-num">02</span>
+      <span class="section-title">Protocolo y Datos del Test<span class="stress-badge">ESTRÉS</span></span>
+      <span class="section-badge badge-empty" id="badge-s1">—</span>
+    </div>
+    <span class="section-chevron">▾</span>
+  </div>
+  <div class="section-body">
+
+    <div class="field-grid field-grid-4">
+      <div class="field-group"><label class="field-label">Tipo de estrés</label>
+        <select class="field-select" id="es_tipo" onchange="updateProtocol()">
+          <option value="">—</option>
+          <option value="banda">Ejercicio — Banda (Bruce)</option>
+          <option value="bicicleta">Ejercicio — Bicicleta</option>
+          <option value="dobutamina">Farmacológico — Dobutamina</option>
+          <option value="dobutamina_viabilidad">Dobutamina — Viabilidad</option>
+          <option value="dipiridamol">Farmacológico — Dipiridamol</option>
+        </select></div>
+      <div class="field-group"><label class="field-label">Protocolo / Dosis máx.</label>
+        <input type="text" class="field-input" id="es_protocolo" placeholder="Bruce / 40 mcg/kg/min"></div>
+      <div class="field-group"><label class="field-label">Contraste ecográfico</label>
+        <select class="field-select" id="es_contraste">
+          <option value="no">No utilizado</option><option value="si">Sí — Sonovue/Definity</option></select></div>
+      <div class="field-group"><label class="field-label">Atropina</label>
+        <select class="field-select" id="es_atropina">
+          <option value="no">No requerida</option><option value="si">Sí</option></select></div>
+    </div>
+    <div class="field-grid field-grid-4">
+      <div class="field-group"><label class="field-label">Tiempo ejercicio / Infusión</label>
+        <div class="field-input-wrap"><input type="number" class="field-input" id="es_tiempo" placeholder="--" step="0.5"><span class="field-unit">min</span></div></div>
+      <div class="field-group"><label class="field-label">METs alcanzados</label>
+        <div class="field-input-wrap"><input type="number" class="field-input" id="es_mets" placeholder="--" step="0.5"><span class="field-unit">METs</span></div></div>
+      <div class="field-group"><label class="field-label">FC máx. alcanzada</label>
+        <div class="field-input-wrap"><input type="number" class="field-input" id="hr_pico_form" placeholder="--" oninput="document.getElementById('hr_pico').value=this.value;calcAdecuacion()"><span class="field-unit">lpm</span></div></div>
+      <div class="field-group"><label class="field-label">% FC máx. pred.</label><div class="calc-value" id="es_adecuacion_val">—</div></div>
+    </div>
+    <div class="field-grid field-grid-3">
+      <div class="field-group"><label class="field-label">Motivo de detención</label>
+        <select class="field-select" id="es_motivo_stop">
+          <option value="limite_fc">Límite FC alcanzado</option><option value="fatiga">Fatiga máxima</option>
+          <option value="disnea">Disnea limitante</option><option value="dolor">Dolor torácico</option>
+          <option value="angina">Angina típica</option><option value="hipotension">Hipotensión</option>
+          <option value="ecg">Cambios ECG</option><option value="wma">Nueva WMA</option>
+          <option value="dosis_max">Dosis máxima farmacológica</option></select></div>
+      <div class="field-group"><label class="field-label">Síntomas durante el test</label>
+        <select class="field-select" id="es_sintomas">
+          <option value="asintomatico">Asintomático</option><option value="fatiga">Fatiga</option>
+          <option value="disnea">Disnea</option><option value="angina_tipica">Angina típica</option>
+          <option value="angina_atipica">Angina atípica</option><option value="mareo">Mareo / presíncope</option>
+          <option value="palpitaciones">Palpitaciones</option></select></div>
+      <div class="field-group"><label class="field-label">Cambios ECG</label>
+        <select class="field-select" id="es_ecg">
+          <option value="sin_cambios">Sin cambios significativos</option>
+          <option value="descenso_st">Descenso ST ≥1mm</option><option value="ascenso_st">Elevación ST</option>
+          <option value="arritmia_v">Arritmia ventricular</option><option value="bloqueo">Bloqueo inducido</option>
+          <option value="no_interpretable">No interpretable</option></select></div>
+    </div>
+    <div style="font-size:12px;color:var(--text3);padding:4px 0;" id="adecuacion_display"></div>
+    <div class="field-grid field-grid-1"><div class="field-group"><label class="field-label">Observaciones del test</label>
+      <textarea class="field-textarea" id="es_obs" rows="2" placeholder="Observaciones adicionales..."></textarea></div></div>
+  </div>
+</div>
+
+<div class="section-card" id="s2">
+  <div class="section-header" onclick="toggleSection('s2')">
+    <div class="section-title-row">
+      <span class="section-num">03</span>
+      <span class="section-title">Evaluación por Etapas<span class="stress-badge">ESTRÉS</span></span>
+      <span class="section-badge badge-empty" id="badge-s2">—</span>
+    </div>
+    <span class="section-chevron">▾</span>
+  </div>
+  <div class="section-body">
+
+    <div class="stage-tabs">
+      <div class="stage-tab active" data-stage="reposo" onclick="showStage('reposo')">🔵 Reposo</div>
+      <div class="stage-tab" data-stage="bajo" onclick="showStage('bajo')">🟡 Bajo esfuerzo</div>
+      <div class="stage-tab" data-stage="pico" onclick="showStage('pico')">🔴 Pico</div>
+      <div class="stage-tab" data-stage="recuperacion" onclick="showStage('recuperacion')">🟢 Recuperación</div>
+    </div>
+
+    <!-- REPOSO -->
+    <div class="stage-panel active" id="panel-reposo">
+      <div class="stage-header">
+        <div class="stage-header-label">🔵 Reposo / Basal</div>
+        <div class="stage-hr-bp">
+    <div class="stage-vitals-item">FC: <input type="number" class="vitals-input" id="hr_reposo" placeholder="--" oninput="calcAdecuacion()"> lpm</div>
+    <div class="stage-vitals-item">PA: <input type="text" class="vitals-input-bp" id="bp_reposo" placeholder="--/--"> mmHg</div>
+    </div>
+      </div>
+      <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">Ventrículo Izquierdo — Función Global</div>
+      <div class="field-grid field-grid-4">
+        <div class="field-group"><label class="field-label">FEVI</label>
+          <div class="field-input-wrap has-mic"><input type="number" class="field-input" id="vi_fevi" placeholder="--"><span class="field-unit">%</span>
+          <button class="mic-btn" onclick="startMic('vi_fevi',this)">🎙</button></div></div>
+        <div class="field-group"><label class="field-label">DDVI</label>
+          <div class="field-input-wrap has-mic"><input type="number" class="field-input" id="vi_ddvi" placeholder="--" step="0.1"><span class="field-unit">mm</span>
+          <button class="mic-btn" onclick="startMic('vi_ddvi',this)">🎙</button></div></div>
+        <div class="field-group"><label class="field-label">WMSI basal</label>
+          <div class="field-input-wrap"><input type="number" class="field-input" id="wmsi_reposo" placeholder="1.0" step="0.1" oninput="interpretWMSI('reposo')"></div></div>
+        <div class="field-group"><label class="field-label">Interpretación</label>
+          <div class="calc-value" id="wmsi_reposo_interp" style="font-size:11px;">—</div></div>
+      </div>
+      <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin:10px 0 6px;">Motilidad Segmentaria — 16 Segmentos (Basal)</div>
+      <div class="wm-grid" id="wm-reposo"></div>
+      
+    <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin:10px 0 6px;">Función Diastólica</div>
+    <div class="field-grid field-grid-4">
+      <div class="field-group"><label class="field-label">Onda E</label>
+        <div class="field-input-wrap has-mic"><input type="number" class="field-input" id="dia_E_reposo" placeholder="--" step="0.1" oninput="calcEE('reposo')">
+        <span class="field-unit">m/s</span><button class="mic-btn" onclick="startMic('dia_E_reposo',this)">🎙</button></div></div>
+      <div class="field-group"><label class="field-label">e' septal</label>
+        <div class="field-input-wrap has-mic"><input type="number" class="field-input" id="eprime_sep_reposo" placeholder="--" step="0.1" oninput="calcEE('reposo')">
+        <span class="field-unit">cm/s</span><button class="mic-btn" onclick="startMic('eprime_sep_reposo',this)">🎙</button></div></div>
+      <div class="field-group"><label class="field-label">e' lateral</label>
+        <div class="field-input-wrap has-mic"><input type="number" class="field-input" id="eprime_lat_reposo" placeholder="--" step="0.1" oninput="calcEE('reposo')">
+        <span class="field-unit">cm/s</span><button class="mic-btn" onclick="startMic('eprime_lat_reposo',this)">🎙</button></div></div>
+      <div class="field-group"><label class="field-label">E/e' promedio</label><div class="calc-value" id="ee_reposo_val">—</div></div>
+    </div>
+      
+    <div class="field-grid field-grid-3">
+      <div class="field-group"><label class="field-label">Vel. IT</label>
+        <div class="field-input-wrap has-mic"><input type="number" class="field-input" id="vt_vel_it_reposo" placeholder="--" step="0.1" oninput="calcPSAP('reposo')">
+        <span class="field-unit">m/s</span><button class="mic-btn" onclick="startMic('vt_vel_it_reposo',this)">🎙</button></div></div>
+      <div class="field-group"><label class="field-label">PSAP estimada</label><div class="calc-value" id="psap_reposo_val">—</div></div>
+      <div class="field-group"><label class="field-label">IM</label>
+        <select class="field-select" id="im_reposo">
+          <option value="0">Sin IM / igual</option><option value="aumenta">Aumenta</option>
+          <option value="1">Leve</option><option value="2">Moderada</option><option value="3">Severa</option>
+        </select></div>
+    </div>
+      <div class="preformat-bar"><span class="preformat-label">Preformatos:</span>
+        <button class="preformat-btn pf-normal" onclick="loadPreformatStress('reposo_texto','stress_reposo_normal')">Normal</button>
+        <button class="preformat-btn pf-severo" onclick="loadPreformatStress('reposo_texto','stress_reposo_wma')">Con WMA</button></div>
+      <textarea class="field-textarea" id="reposo_texto" rows="2" placeholder="Hallazgos en reposo..."></textarea>
+    </div>
+
+    <!-- BAJO ESFUERZO / BAJA DOSIS -->
+    <div class="stage-panel" id="panel-bajo">
+      <div class="stage-header">
+        <div class="stage-header-label" id="bajo-label">🟡 Bajo esfuerzo / Baja dosis</div>
+        <div class="stage-hr-bp">
+    <div class="stage-vitals-item">FC: <input type="number" class="vitals-input" id="hr_bajo" placeholder="--" oninput="calcAdecuacion()"> lpm</div>
+    <div class="stage-vitals-item">PA: <input type="text" class="vitals-input-bp" id="bp_bajo" placeholder="--/--"> mmHg</div>
+    <div class="stage-vitals-item" id="dob_bajo_section">Dosis: <input type="number" class="vitals-input" id="dob_bajo_dosis" placeholder="5"> mcg/kg/min</div></div>
+      </div>
+      <div class="field-grid field-grid-4">
+        <div class="field-group"><label class="field-label">FEVI</label>
+          <div class="field-input-wrap"><input type="number" class="field-input" id="vi_fevi_bajo" placeholder="--"><span class="field-unit">%</span></div></div>
+        <div class="field-group"><label class="field-label">WMSI</label>
+          <div class="field-input-wrap"><input type="number" class="field-input" id="wmsi_bajo" placeholder="--" step="0.1" oninput="interpretWMSI('bajo')"></div></div>
+        <div class="field-group"><label class="field-label">vs. Basal</label>
+          <div class="calc-value" id="wmsi_bajo_vs">—</div></div>
+        <div class="field-group"><label class="field-label">IM</label>
+          <select class="field-select" id="im_bajo">
+            <option value="0">Sin IM / igual</option><option value="aumenta">Aumenta</option>
+            <option value="1">Leve</option><option value="2">Moderada</option></select></div>
+      </div>
+      <div style="font-size:11px;font-weight:700;color:#10b981;text-transform:uppercase;letter-spacing:.05em;margin:10px 0 6px;">Respuesta Segmentaria — Baja Dosis / Viabilidad</div>
+      <div class="wm-grid" id="wm-bajo"></div>
+      <div style="font-size:10px;color:var(--text3);margin:4px 0 8px;">NK=Normal · HKl/m/s=Hipocinesia · AK=Acinesia · MEJ=Mejoría · BIF=Bifásico · DK=Discinesia</div>
+      
+    <div class="field-grid field-grid-3">
+      <div class="field-group"><label class="field-label">Vel. IT</label>
+        <div class="field-input-wrap has-mic"><input type="number" class="field-input" id="vt_vel_it_bajo" placeholder="--" step="0.1" oninput="calcPSAP('bajo')">
+        <span class="field-unit">m/s</span><button class="mic-btn" onclick="startMic('vt_vel_it_bajo',this)">🎙</button></div></div>
+      <div class="field-group"><label class="field-label">PSAP estimada</label><div class="calc-value" id="psap_bajo_val">—</div></div>
+      <div class="field-group"><label class="field-label">IM</label>
+        <select class="field-select" id="im_bajo">
+          <option value="0">Sin IM / igual</option><option value="aumenta">Aumenta</option>
+          <option value="1">Leve</option><option value="2">Moderada</option><option value="3">Severa</option>
+        </select></div>
+    </div>
+      <div class="preformat-bar"><span class="preformat-label">Preformatos:</span>
+        <button class="preformat-btn pf-normal" onclick="loadPreformatStress('bajo_texto','stress_bajo_normal')">Sin cambios</button>
+        <button class="preformat-btn pf-leve" onclick="loadPreformatStress('bajo_texto','stress_bajo_mejoria')">Mejoría (viabilidad)</button>
+        <button class="preformat-btn pf-moderado" onclick="loadPreformatStress('bajo_texto','stress_bajo_bifasico')">Bifásico</button>
+        <button class="preformat-btn pf-severo" onclick="loadPreformatStress('bajo_texto','stress_bajo_isquemia')">Isquemia precoz</button></div>
+      <textarea class="field-textarea" id="bajo_texto" rows="2" placeholder="Bajo esfuerzo / baja dosis..."></textarea>
+    </div>
+
+    <!-- PICO -->
+    <div class="stage-panel" id="panel-pico">
+      <div class="stage-header">
+        <div class="stage-header-label">🔴 Pico del Esfuerzo / Dosis Máxima</div>
+        <div class="stage-hr-bp">
+    <div class="stage-vitals-item">FC: <input type="number" class="vitals-input" id="hr_pico" placeholder="--" oninput="calcAdecuacion()"> lpm</div>
+    <div class="stage-vitals-item">PA: <input type="text" class="vitals-input-bp" id="bp_pico" placeholder="--/--"> mmHg</div>
+    <div class="stage-vitals-item">RPP: <span id="rpp_val" style="font-weight:600;color:var(--text2);">—</span></div></div>
+      </div>
+      <div class="field-grid field-grid-4">
+        <div class="field-group"><label class="field-label">FEVI pico</label>
+          <div class="field-input-wrap has-mic"><input type="number" class="field-input" id="vi_fevi_pico" placeholder="--" oninput="calcFEVIDelta()"><span class="field-unit">%</span>
+          <button class="mic-btn" onclick="startMic('vi_fevi_pico',this)">🎙</button></div></div>
+        <div class="field-group"><label class="field-label">ΔFEVI vs. basal</label>
+          <div class="calc-value" id="fevi_delta_val">—</div></div>
+        <div class="field-group"><label class="field-label">WMSI pico</label>
+          <div class="field-input-wrap"><input type="number" class="field-input" id="wmsi_pico" placeholder="--" step="0.1" oninput="interpretWMSI('pico')"></div></div>
+        <div class="field-group"><label class="field-label">vs. Basal</label>
+          <div class="calc-value" id="wmsi_pico_vs">—</div></div>
+      </div>
+      <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin:10px 0 6px;">Motilidad Segmentaria — Pico</div>
+      <div class="wm-grid" id="wm-pico"></div>
+      
+    <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin:10px 0 6px;">Función Diastólica</div>
+    <div class="field-grid field-grid-4">
+      <div class="field-group"><label class="field-label">Onda E</label>
+        <div class="field-input-wrap has-mic"><input type="number" class="field-input" id="dia_E_pico" placeholder="--" step="0.1" oninput="calcEE('pico')">
+        <span class="field-unit">m/s</span><button class="mic-btn" onclick="startMic('dia_E_pico',this)">🎙</button></div></div>
+      <div class="field-group"><label class="field-label">e' septal</label>
+        <div class="field-input-wrap has-mic"><input type="number" class="field-input" id="eprime_sep_pico" placeholder="--" step="0.1" oninput="calcEE('pico')">
+        <span class="field-unit">cm/s</span><button class="mic-btn" onclick="startMic('eprime_sep_pico',this)">🎙</button></div></div>
+      <div class="field-group"><label class="field-label">e' lateral</label>
+        <div class="field-input-wrap has-mic"><input type="number" class="field-input" id="eprime_lat_pico" placeholder="--" step="0.1" oninput="calcEE('pico')">
+        <span class="field-unit">cm/s</span><button class="mic-btn" onclick="startMic('eprime_lat_pico',this)">🎙</button></div></div>
+      <div class="field-group"><label class="field-label">E/e' promedio</label><div class="calc-value" id="ee_pico_val">—</div></div>
+    </div>
+      
+    <div class="field-grid field-grid-3">
+      <div class="field-group"><label class="field-label">Vel. IT</label>
+        <div class="field-input-wrap has-mic"><input type="number" class="field-input" id="vt_vel_it_pico" placeholder="--" step="0.1" oninput="calcPSAP('pico')">
+        <span class="field-unit">m/s</span><button class="mic-btn" onclick="startMic('vt_vel_it_pico',this)">🎙</button></div></div>
+      <div class="field-group"><label class="field-label">PSAP estimada</label><div class="calc-value" id="psap_pico_val">—</div></div>
+      <div class="field-group"><label class="field-label">IM</label>
+        <select class="field-select" id="im_pico">
+          <option value="0">Sin IM / igual</option><option value="aumenta">Aumenta</option>
+          <option value="1">Leve</option><option value="2">Moderada</option><option value="3">Severa</option>
+        </select></div>
+    </div>
+      <div class="preformat-bar"><span class="preformat-label">Preformatos:</span>
+        <button class="preformat-btn pf-normal" onclick="loadPreformatStress('pico_texto','stress_pico_normal')">Sin isquemia</button>
+        <button class="preformat-btn pf-severo" onclick="loadPreformatStress('pico_texto','stress_pico_isquemia')">Isquemia inducible</button>
+        <button class="preformat-btn pf-moderado" onclick="loadPreformatStress('pico_texto','stress_pico_dsf_diastolica')">DSF diastólica</button>
+        <button class="preformat-btn" onclick="loadPreformatStress('pico_texto','stress_pico_hp_esfuerzo')">HP inducible</button></div>
+      <textarea class="field-textarea" id="pico_texto" rows="2" placeholder="Hallazgos en el pico..."></textarea>
+    </div>
+
+    <!-- RECUPERACIÓN -->
+    <div class="stage-panel" id="panel-recuperacion">
+      <div class="stage-header">
+        <div class="stage-header-label">🟢 Recuperación</div>
+        <div class="stage-hr-bp">
+    <div class="stage-vitals-item">FC: <input type="number" class="vitals-input" id="hr_rec" placeholder="--" oninput="calcAdecuacion()"> lpm</div>
+    <div class="stage-vitals-item">PA: <input type="text" class="vitals-input-bp" id="bp_rec" placeholder="--/--"> mmHg</div>
+    <div class="stage-vitals-item">Tiempo: <input type="number" class="vitals-input" id="rec_tiempo" placeholder="3"> min</div></div>
+      </div>
+      <div class="field-grid field-grid-4">
+        <div class="field-group"><label class="field-label">FEVI recuperación</label>
+          <div class="field-input-wrap"><input type="number" class="field-input" id="vi_fevi_rec" placeholder="--"><span class="field-unit">%</span></div></div>
+        <div class="field-group"><label class="field-label">WMSI recuperación</label>
+          <div class="field-input-wrap"><input type="number" class="field-input" id="wmsi_rec" placeholder="--" step="0.1"></div></div>
+        <div class="field-group"><label class="field-label">Normalización WMA</label>
+          <select class="field-select" id="wma_normalizacion">
+            <option value="N/A">N/A (sin WMA)</option><option value="completa">Normalización completa</option>
+            <option value="parcial">Normalización parcial</option><option value="persistente">WMA persistente</option></select></div>
+        <div class="field-group"><label class="field-label">PSAP recuperación</label>
+          <div class="calc-value" id="psap_rec_val">—</div></div>
+      </div>
+      <div class="field-grid field-grid-2">
+        <div class="field-group"><label class="field-label">Vel. IT recuperación</label>
+          <div class="field-input-wrap"><input type="number" class="field-input" id="vt_vel_it_rec" placeholder="--" step="0.1" oninput="calcPSAP('rec')"><span class="field-unit">m/s</span></div></div>
+        <div class="field-group"><label class="field-label">E/e' recuperación</label>
+          <div class="field-input-wrap"><input type="number" class="field-input" id="ee_rec" placeholder="--" step="0.1"></div></div>
+      </div>
+      <div class="preformat-bar"><span class="preformat-label">Preformatos:</span>
+        <button class="preformat-btn pf-normal" onclick="loadPreformatStress('rec_texto','stress_rec_normal')">Normalización completa</button>
+        <button class="preformat-btn pf-severo" onclick="loadPreformatStress('rec_texto','stress_rec_wma_persist')">WMA persistente</button></div>
+      <textarea class="field-textarea" id="rec_texto" rows="2" placeholder="Recuperación..."></textarea>
+    </div>
+  </div>
+</div>
+
+<div class="section-card" id="s3">
+  <div class="section-header" onclick="toggleSection('s3')">
+    <div class="section-title-row">
+      <span class="section-num">04</span>
+      <span class="section-title">Resumen — Isquemia / Viabilidad<span class="stress-badge">ESTRÉS</span></span>
+      <span class="section-badge badge-empty" id="badge-s3">—</span>
+    </div>
+    <span class="section-chevron">▾</span>
+  </div>
+  <div class="section-body">
+
+    <div class="field-grid field-grid-3">
+      <div class="field-group"><label class="field-label">Isquemia inducible</label>
+        <select class="field-select" id="res_isquemia">
+          <option value="no">No — Estudio negativo</option>
+          <option value="si_1v">Sí — 1 vaso</option><option value="si_2v">Sí — 2 vasos</option>
+          <option value="si_3v">Sí — Multivaso / extensa</option>
+          <option value="probable">Probable — limitaciones técnicas</option></select></div>
+      <div class="field-group"><label class="field-label">Territorio isquémico</label>
+        <select class="field-select" id="res_territorio">
+          <option value="—">—</option><option value="DAI/Anterior">DAI / Anterior</option>
+          <option value="Cx/Lateral">Cx / Lateral</option><option value="CD/Inferior">CD / Inferior</option>
+          <option value="DAI+Cx">DAI + Cx</option><option value="DAI+CD">DAI + CD</option>
+          <option value="multivaso">Multivaso</option></select></div>
+      <div class="field-group"><label class="field-label">Viabilidad miocárdica</label>
+        <select class="field-select" id="res_viabilidad">
+          <option value="na">No evaluada</option>
+          <option value="presente">Presente — respuesta bifásica</option>
+          <option value="reserva">Reserva contráctil</option>
+          <option value="ausente">Ausente — sin respuesta</option></select></div>
+    </div>
+    <div class="field-grid field-grid-3">
+      <div class="field-group"><label class="field-label">DSF diastólica inducida</label>
+        <select class="field-select" id="res_dsf_diastolica">
+          <option value="no">No</option><option value="si">Sí — E/e' &gt;15 pico</option>
+          <option value="hp_inducible">HP inducible (PSAP &gt;60 mmHg)</option></select></div>
+      <div class="field-group"><label class="field-label">IM inducible</label>
+        <select class="field-select" id="res_im">
+          <option value="no">No</option><option value="leve">Leve inducible</option>
+          <option value="mod">Moderada inducible</option><option value="sev">Severa inducible</option></select></div>
+      <div class="field-group"><label class="field-label">Dilatación isquémica transitoria</label>
+        <select class="field-select" id="res_dit">
+          <option value="no">No</option><option value="si">Sí (ratio &gt;1.7)</option></select></div>
+    </div>
+    <div class="preformat-bar"><span class="preformat-label">Conclusiones:</span>
+      <button class="preformat-btn pf-normal" onclick="loadPreformatStress('resumen_texto','stress_concl_negativo')">Negativo para isquemia</button>
+      <button class="preformat-btn pf-leve" onclick="loadPreformatStress('resumen_texto','stress_concl_isquemia_1v')">Isquemia 1 vaso</button>
+      <button class="preformat-btn pf-severo" onclick="loadPreformatStress('resumen_texto','stress_concl_isquemia_ext')">Isquemia extensa</button>
+      <button class="preformat-btn pf-moderado" onclick="loadPreformatStress('resumen_texto','stress_concl_viabilidad')">Viabilidad</button>
+      <button class="preformat-btn" onclick="loadPreformatStress('resumen_texto','stress_concl_dsf')">DSF diastólica esfuerzo</button></div>
+    <textarea class="field-textarea" id="resumen_texto" rows="4" placeholder="Resumen del estudio de estrés..."></textarea>
+  </div>
+</div>
+
+<div class="section-card" id="s4">
+  <div class="section-header" onclick="toggleSection('s4')">
+    <div class="section-title-row">
+      <span class="section-num">05</span>
+      <span class="section-title">Hallazgos Basales</span>
+      <span class="section-badge badge-empty" id="badge-s4">—</span>
+    </div>
+    <span class="section-chevron">▾</span>
+  </div>
+  <div class="section-body">
+
+    <div class="field-grid field-grid-4">
+      <div class="field-group"><label class="field-label">DDVI</label>
+        <div class="field-input-wrap"><input type="number" class="field-input" id="vi_ddvi_b" placeholder="--" step="0.1"><span class="field-unit">mm</span></div></div>
+      <div class="field-group"><label class="field-label">SIV</label>
+        <div class="field-input-wrap"><input type="number" class="field-input" id="vi_siv" placeholder="--" step="0.1"><span class="field-unit">mm</span></div></div>
+      <div class="field-group"><label class="field-label">PP</label>
+        <div class="field-input-wrap"><input type="number" class="field-input" id="vi_pp" placeholder="--" step="0.1"><span class="field-unit">mm</span></div></div>
+      <div class="field-group"><label class="field-label">Vel. IT basal</label>
+        <div class="field-input-wrap"><input type="number" class="field-input" id="vi_vt_basal" placeholder="--" step="0.1"><span class="field-unit">m/s</span></div></div>
+    </div>
+    <div class="field-grid field-grid-1"><div class="field-group"><label class="field-label">Hallazgos basales relevantes</label>
+      <textarea class="field-textarea" id="basales_texto" rows="2" placeholder="Válvulas, pericardio, hallazgos incidentales..."></textarea></div></div>
+  </div>
+</div>
+
+<div class="section-card" id="s5">
+  <div class="section-header" onclick="toggleSection('s5')">
+    <div class="section-title-row">
+      <span class="section-num">06</span>
+      <span class="section-title">Conclusiones</span>
+      <span class="section-badge badge-empty" id="badge-s5">—</span>
+    </div>
+    <span class="section-chevron">▾</span>
+  </div>
+  <div class="section-body">
+
+    <textarea class="field-textarea" id="conclusionesText" rows="5" placeholder="Conclusiones del ecocardiograma de estrés..."></textarea>
+  </div>
+</div>
+</div>
+<div id="pr-layout" style="display:none"></div><div id="printSubtitle" style="display:none"></div>
+<script>
+
+// ============================================================
+// PREFORMATOS
+// ============================================================
+const PF = {
+  ct_normal: "Estudio realizado con ventana ecográfica adecuada. Ritmo {ct_ritmo}. El examen permite valorar todas las estructuras cardíacas con calidad diagnóstica.",
+  ct_suboptima: "Estudio realizado con ventana ecográfica subóptima. Ritmo {ct_ritmo}. La calidad técnica limita parcialmente la valoración de algunas estructuras, aunque permite obtener información diagnóstica relevante.",
+  ct_limitada: "Estudio técnicamente limitado por ventana ecográfica deficiente. Ritmo {ct_ritmo}. Las mediciones deben interpretarse con precaución. Se recomienda complementar con otros métodos de imagen si la situación clínica lo requiere.",
+
+  vi_normal: "El ventrículo izquierdo presenta dimensiones normales (DDVI {vi_ddvi} mm, DSVI {vi_dsvi} mm). Grosores parietales normales (SIV {vi_siv} mm, PP {vi_pp} mm). Función sistólica global conservada, FEVI estimada por Simpson biplano del {vi_fevi}%. Volúmenes: VTD {vi_vtd} mL, VTS {vi_vts} mL. Masa VI indexada: {vi_masai_val}. Patrón geométrico: {vi_patron_val}. No se identifican alteraciones de la contractilidad segmentaria.",
+  vi_disfuncion_leve: "El ventrículo izquierdo presenta dimensiones levemente alteradas (DDVI {vi_ddvi} mm, DSVI {vi_dsvi} mm). Grosores parietales: SIV {vi_siv} mm, PP {vi_pp} mm. Función sistólica global levemente deprimida, FEVI {vi_fevi}% por Simpson biplano. Volúmenes: VTD {vi_vtd} mL, VTS {vi_vts} mL. Masa VI indexada: {vi_masai_val}. Patrón geométrico: {vi_patron_val}.",
+  vi_disfuncion_mod: "El ventrículo izquierdo está moderadamente dilatado (DDVI {vi_ddvi} mm, DSVI {vi_dsvi} mm). Grosores: SIV {vi_siv} mm, PP {vi_pp} mm. Función sistólica global moderadamente deprimida, FEVI {vi_fevi}% por Simpson biplano (VTD {vi_vtd} mL, VTS {vi_vts} mL). Masa VI indexada: {vi_masai_val}. Patrón geométrico: {vi_patron_val}. Se observa hipocinesia difusa generalizada.",
+  vi_disfuncion_sev: "El ventrículo izquierdo está severamente dilatado (DDVI {vi_ddvi} mm, DSVI {vi_dsvi} mm). Grosores: SIV {vi_siv} mm, PP {vi_pp} mm. Función sistólica severamente comprometida: FEVI {vi_fevi}% por Simpson biplano (VTD {vi_vtd} mL, VTS {vi_vts} mL). Masa VI indexada: {vi_masai_val}. Patrón geométrico: {vi_patron_val}. Acinesia/hipocinesia difusa generalizada.",
+  vi_hipertrofia: "El ventrículo izquierdo presenta hipertrofia de sus paredes (SIV {vi_siv} mm, PP {vi_pp} mm) con dimensiones internas: DDVI {vi_ddvi} mm, DSVI {vi_dsvi} mm. Función sistólica conservada, FEVI {vi_fevi}% (VTD {vi_vtd} mL, VTS {vi_vts} mL). Masa VI indexada: {vi_masai_val}. Patrón geométrico: {vi_patron_val}. No se documentan alteraciones segmentarias.",
+  vi_dilatacion: "El ventrículo izquierdo está dilatado (DDVI {vi_ddvi} mm) con función sistólica conservada (FEVI {vi_fevi}%). Grosores normales (SIV {vi_siv} mm, PP {vi_pp} mm). Patrón geométrico: remodelado excéntrico.",
+
+  // Trastornos segmentarios
+  vi_seg_hipo_focal: "Se identifican trastornos segmentarios de la contractilidad: hipocinesia focal en el territorio {vi_seg_territorio}, comprometiendo {vi_seg_extension}. El resto de los segmentos miocárdicos conservan motilidad y engrosamiento sistólico normales. FEVI global {vi_fevi}% por Simpson biplano. Los hallazgos son compatibles con cardiopatía isquémica en dicho territorio.",
+  vi_seg_acinesia: "Se documentan trastornos segmentarios de la contractilidad: acinesia en el territorio {vi_seg_territorio}, con extensión de {vi_seg_extension}. Los segmentos adyacentes muestran hipocinesia compensatoria. FEVI global {vi_fevi}% por Simpson biplano. Patrón compatible con infarto establecido / cardiopatía isquémica significativa.",
+  vi_seg_aneurisma: "Se identifica aneurisma segmentario del ventrículo izquierdo en el territorio {vi_seg_territorio}, con discinesia sistólica y adelgazamiento parietal en {vi_seg_extension}. FEVI global {vi_fevi}%. Se recomienda vigilancia de trombo intracavitario y anticoagulación según contexto clínico.",
+
+  dia_normal: "El llenado ventricular izquierdo muestra patrón diastólico normal. Onda E {dia_E} m/s, onda A {dia_A} m/s, relación E/A {ea_ratio}, TDE {dia_tde} ms. Velocidades miocárdicas: e' septal {dia_eprime_sep} cm/s, e' lateral {dia_eprime_lat} cm/s. Relación E/e' media {ee_ratio}, dentro de límites normales. No hay criterios para disfunción diastólica significativa.",
+  dia_g1: "Disfunción diastólica grado I (relajación deteriorada). Onda E {dia_E} m/s, onda A {dia_A} m/s, relación E/A {ea_ratio} (invertida). TDE {dia_tde} ms (prolongado). e' septal {dia_eprime_sep} cm/s, e' lateral {dia_eprime_lat} cm/s (reducidas). E/e' media {ee_ratio}. Presiones de llenado normales.",
+  dia_g2: "Disfunción diastólica grado II (patrón pseudonormal / presiones de llenado elevadas). Onda E {dia_E} m/s, onda A {dia_A} m/s, relación E/A {ea_ratio}. TDE {dia_tde} ms. e' septal {dia_eprime_sep} cm/s, e' lateral {dia_eprime_lat} cm/s (reducidas). E/e' media {ee_ratio} (elevada). Indica incremento de presiones de llenado.",
+  dia_g3: "Disfunción diastólica grado III (patrón restrictivo). Presiones de llenado marcadamente elevadas. Onda E {dia_E} m/s, onda A {dia_A} m/s, relación E/A {ea_ratio}. TDE {dia_tde} ms (acortado). e' septal {dia_eprime_sep} cm/s, e' lateral {dia_eprime_lat} cm/s. E/e' media {ee_ratio}.",
+  dia_fa: "Valoración diastólica limitada por fibrilación auricular. Velocidad E {dia_E} m/s. e' septal {dia_eprime_sep} cm/s, e' lateral {dia_eprime_lat} cm/s. E/e' media {ee_ratio}.",
+  dia_indeterminada: "La función diastólica del ventrículo izquierdo no puede clasificarse con certeza (función diastólica indeterminada) por criterios ASE/EACVI 2016, dado que los parámetros disponibles son insuficientes o discordantes entre sí. Onda E {dia_E} m/s, onda A {dia_A} m/s, relación E/A {ea_ratio}. e' septal {dia_eprime_sep} cm/s, e' lateral {dia_eprime_lat} cm/s. E/e' media {ee_ratio}. Se recomienda correlación clínica y seguimiento.",
+
+  ai_normal: "Aurícula izquierda de dimensiones normales. Diámetro AP {ai_diam} mm. Volumen indexado {ai_voli} mL/m² (normal ≤34 mL/m²). Sin masas ni trombos.",
+  ai_leve: "Aurícula izquierda levemente dilatada. Diámetro AP {ai_diam} mm. Volumen indexado {ai_voli} mL/m².",
+  ai_moderada: "Aurícula izquierda moderadamente dilatada. Diámetro AP {ai_diam} mm. Volumen indexado {ai_voli} mL/m². La dilatación puede estar en relación con disfunción diastólica crónica, valvulopatía mitral o fibrilación auricular.",
+  ai_severa: "Dilatación auricular izquierda severa. Diámetro AP {ai_diam} mm. Volumen indexado {ai_voli} mL/m². Asociado a mayor riesgo de fibrilación auricular y fenómenos tromboembólicos.",
+
+  vd_normal: "El ventrículo derecho presenta dimensiones normales: diámetro basal {vd_diam} mm, diámetro medio {vd_diam_medio} mm, diámetro longitudinal {vd_diam_long} mm. Función sistólica global conservada: TAPSE {vd_tapse} mm, S' por TDI {vd_sprime} cm/s, FAC {vd_fac}%. Grosor pared libre {vd_grosor} mm.",
+  vd_disfuncion_leve: "Función sistólica del VD levemente deprimida. TAPSE {vd_tapse} mm, S' {vd_sprime} cm/s, FAC {vd_fac}%. Dimensiones: diámetro basal {vd_diam} mm, medio {vd_diam_medio} mm, longitudinal {vd_diam_long} mm.",
+  vd_disfuncion_mod: "Disfunción sistólica moderada del VD. TAPSE {vd_tapse} mm, S' {vd_sprime} cm/s, FAC {vd_fac}%. Diámetros: basal {vd_diam} mm, medio {vd_diam_medio} mm, longitudinal {vd_diam_long} mm.",
+  vd_disfuncion_sev: "Disfunción sistólica severa del VD. TAPSE {vd_tapse} mm, S' {vd_sprime} cm/s, FAC {vd_fac}%. VD dilatado: diámetro basal {vd_diam} mm, medio {vd_diam_medio} mm, longitudinal {vd_diam_long} mm. Grosor pared libre {vd_grosor} mm.",
+  vd_dilatado: "VD dilatado: diámetro basal {vd_diam} mm, diámetro medio {vd_diam_medio} mm, diámetro longitudinal {vd_diam_long} mm. Grosor pared libre {vd_grosor} mm. Función sistólica: TAPSE {vd_tapse} mm, S' {vd_sprime} cm/s, FAC {vd_fac}%.",
+
+  vm_normal: "Válvula mitral de morfología normal ({vm_morfologia}), valvas delgadas y móviles. Gradiente medio {vm_gmedio} mmHg. Sin estenosis ni regurgitación hemodinámicamente significativa.",
+  vm_estenosis_leve: "Estenosis mitral leve de probable etiología reumática. Gradiente medio {vm_gmedio} mmHg. Área valvular por PHT: {vm_area_pht} cm² (PHT {vm_pht} ms).",
+  vm_estenosis_mod: "Estenosis mitral moderada. Gradiente medio {vm_gmedio} mmHg. Área valvular por PHT: {vm_area_pht} cm² (PHT {vm_pht} ms).",
+  vm_estenosis_sev: "Estenosis mitral severa. Área valvular {vm_area_pht} cm² (PHT {vm_pht} ms), gradiente medio {vm_gmedio} mmHg. Se recomienda valoración para intervención.",
+  vm_im_leve: "Regurgitación mitral leve (grado I/IV). Sin hallazgos de remodelado cardíaco asociado.",
+  vm_im_mod: "Válvula mitral de morfología {vm_morfologia}. Regurgitación mitral moderada (grado II/IV). Mecanismo: clasificación de Carpentier tipo {vm_carpentier}. Gradiente medio {vm_gmedio} mmHg. Se recomienda seguimiento periódico.",
+  vm_im_sev: "Válvula mitral de morfología {vm_morfologia}. Regurgitación mitral severa (grado {vm_rm_grado}/IV). Carpentier tipo {vm_carpentier}. ERO {vm_ero} cm², volumen regurgitante {vm_volreg} mL. Gradiente medio {vm_gmedio} mmHg. Requiere valoración para intervención.",
+  vm_prolapso: "Válvula mitral de morfología {vm_morfologia}. Prolapso de velo mitral con protrusión posterior del plano valvular en sístole. Carpentier tipo {vm_carpentier}. Regurgitación mitral grado {vm_rm_grado}/IV. Gradiente medio {vm_gmedio} mmHg.",
+
+  va_normal: "Válvula aórtica {va_morfologia}, valvas delgadas y móviles. Gmax {va_gmax} mmHg, Gmedio {va_gmedio} mmHg. AVA por ecuación de continuidad {va_ava_val}. Sin estenosis ni regurgitación significativa.",
+  va_esclerosis: "Válvula aórtica {va_morfologia} con esclerosis de sus valvas (engrosamiento, ecos brillantes) sin estenosis significativa. Gmax {va_gmax} mmHg, Gmedio {va_gmedio} mmHg. AVA {va_ava_val}. Apertura conservada.",
+  va_ea_leve: "Válvula aórtica {va_morfologia}. Estenosis aórtica leve. Gmax {va_gmax} mmHg, Gmedio {va_gmedio} mmHg. AVA por ecuación de continuidad: {va_ava_val}.",
+  va_ea_mod: "Válvula aórtica {va_morfologia}. Estenosis aórtica moderada. Gmax {va_gmax} mmHg, Gmedio {va_gmedio} mmHg. AVA por ecuación de continuidad: {va_ava_val}. Requiere seguimiento periódico.",
+  va_ea_sev: "Válvula aórtica {va_morfologia}. Estenosis aórtica severa. Gmax {va_gmax} mmHg, Gmedio {va_gmedio} mmHg. AVA {va_ava_val} (<1.0 cm²). Requiere valoración para intervención (SAVR o TAVI).",
+  va_ia_leve: "Válvula aórtica {va_morfologia}. Regurgitación aórtica leve (grado I/IV). Gmax {va_gmax} mmHg, Gmedio {va_gmedio} mmHg. AVA {va_ava} cm². Sin remodelado del VI asociado.",
+  va_ia_mod: "Válvula aórtica {va_morfologia}. Regurgitación aórtica moderada (grado II/IV). Gmax {va_gmax} mmHg, Gmedio {va_gmedio} mmHg. AVA {va_ava} cm². Ancho chorro/TSVI {va_ra_ratio}%. PHT aórtico {va_pht_ra} ms.",
+  va_ia_sev: "Válvula aórtica {va_morfologia}. Regurgitación aórtica severa (grado {va_ra_grado}/IV). Gmax {va_gmax} mmHg, Gmedio {va_gmedio} mmHg. AVA {va_ava} cm². Ancho chorro/TSVI {va_ra_ratio}%. PHT {va_pht_ra} ms (acortado). Sobrecarga de volumen del VI. Requiere valoración para intervención (SAVR o TAVI).",
+  va_bav: "Válvula aórtica bicúspide (anomalía congénita, fusión comisural). Gmax {va_gmax} mmHg, Gmedio {va_gmedio} mmHg. AVA {va_ava_val}. Mayor riesgo de estenosis/regurgitación progresiva y dilatación aórtica. Seguimiento ecocardiográfico regular recomendado.",
+
+  vt_normal: "Válvula tricúspide de morfología {vt_morfologia}. Regurgitación fisiológica/mínima (grado {vt_it_grado}/IV). Vel. pico IT {vt_vel_it} m/s. PAD estimada {vt_pad_val} mmHg. PSAP estimada {vt_psap} mmHg, dentro de límites normales.",
+  vt_it_leve: "Válvula tricúspide de morfología {vt_morfologia}. Regurgitación tricuspídea leve (grado I/IV). Vel. pico IT {vt_vel_it} m/s. PAD estimada {vt_pad_val} mmHg. PSAP estimada {vt_psap} mmHg.",
+  vt_it_mod: "Válvula tricúspide de morfología {vt_morfologia}. Regurgitación tricuspídea moderada (grado II/IV). Vel. pico IT {vt_vel_it} m/s. PAD estimada {vt_pad_val} mmHg. PSAP estimada {vt_psap} mmHg. Dilatación del anillo tricuspídeo.",
+  vt_it_sev: "Válvula tricúspide de morfología {vt_morfologia}. Regurgitación tricuspídea severa (grado {vt_it_grado}/IV). Vel. pico IT {vt_vel_it} m/s. PAD estimada {vt_pad_val} mmHg. PSAP estimada {vt_psap} mmHg. Sobrecarga de volumen del VD con dilatación auricular derecha.",
+  vt_hap: "IT con velocidad pico {vt_vel_it} m/s. PSAP estimada {vt_psap} mmHg (PAD {vt_pad_val} mmHg). Hallazgos compatibles con hipertensión arterial pulmonar que requiere estudio complementario.",
+
+  vp_normal: "Válvula pulmonar de morfología normal. Velocidad de flujo {vp_vel} m/s. Regurgitación pulmonar fisiológica.",
+  vp_estenosis: "Estenosis de válvula pulmonar. Velocidad pico {vp_vel} m/s, gradiente medio {vp_gmedio} mmHg.",
+
+  ao_normal: "Aorta de dimensiones normales en todos los segmentos. Senos de Valsalva {ao_senos} mm, unión sinotubular {ao_ust} mm, aorta ascendente {ao_ascendente} mm. Sin dilatación aneurismática ni signos de disección.",
+  ao_dilatacion_leve: "Dilatación leve de la raíz aórtica/aorta ascendente. Senos de Valsalva {ao_senos} mm, UST {ao_ust} mm, aorta ascendente {ao_ascendente} mm. Se recomienda seguimiento ecocardiográfico anual.",
+  ao_aneurisma: "Aneurisma de la aorta torácica. Senos de Valsalva {ao_senos} mm, UST {ao_ust} mm, aorta ascendente {ao_ascendente} mm. Diámetros significativamente mayores a los límites de referencia. Valoración por cirugía cardiovascular.",
+  ao_diseccion_a: "⚠ EMERGENCIA — Hallazgos altamente sugestivos de disección aórtica tipo Stanford A (DeBakey I/II). Flap intimal en aorta ascendente. Requiere valoración quirúrgica urgente.",
+  ao_diseccion_b: "Disección aórtica tipo Stanford B (DeBakey III). Flap intimal en aorta descendente sin afectación aparente de la aorta ascendente. Manejo médico intensivo y valoración por cirugía cardiovascular.",
+
+  ap_normal: "Tronco de arteria pulmonar de diámetro normal ({ap_diam} mm, referencia <25 mm). Vena cava inferior de diámetro normal ({vci_diam} mm) con colapso inspiratorio adecuado ({vci_colapso}). Presión auricular derecha estimada en {vci_pad} mmHg.",
+  ap_dilatada: "Tronco de arteria pulmonar dilatado ({ap_diam} mm, referencia <25 mm), hallazgo compatible con hipertensión arterial pulmonar. Vena cava inferior de diámetro {vci_diam} mm con colapso inspiratorio {vci_colapso}. Presión auricular derecha estimada en {vci_pad} mmHg.",
+  vci_dilatada: "Tronco de arteria pulmonar de diámetro {ap_diam} mm. Vena cava inferior dilatada ({vci_diam} mm) con colapso inspiratorio reducido ({vci_colapso}). Presión auricular derecha elevada estimada en {vci_pad} mmHg. Los hallazgos son compatibles con incremento de las presiones de llenado del ventrículo derecho.",
+
+  ap_dilatada_vci_dilatada: "Tronco de arteria pulmonar dilatado ({ap_diam} mm, referencia <25 mm). Vena cava inferior dilatada ({vci_diam} mm) con colapso inspiratorio reducido ({vci_colapso}). Presión auricular derecha elevada estimada en {vci_pad} mmHg. El conjunto de hallazgos es compatible con hipertensión arterial pulmonar con sobrecarga del corazón derecho.",
+  ap_normal_vci_dilatada: "Tronco de arteria pulmonar de diámetro normal ({ap_diam} mm). Vena cava inferior dilatada ({vci_diam} mm) con colapso inspiratorio reducido ({vci_colapso}). Presión auricular derecha elevada estimada en {vci_pad} mmHg. Hallazgos compatibles con incremento de las presiones de llenado del ventrículo derecho.",
+
+  per_normal: "Pericardio de grosor normal. Sin derrame pericárdico ni signos de pericarditis.",
+  per_leve: "Derrame pericárdico leve, predominio posterior, separación pico {per_tamano} mm. Sin signos de compromiso hemodinámico.",
+  per_moderado: "Derrame pericárdico moderado de {per_tamano} mm, distribución {per_loc}. Sin signos francos de tamponamiento. Se recomienda seguimiento estrecho.",
+  per_severo: "Derrame pericárdico severo, circunferencial, separación pico {per_tamano} mm. Movimiento pendular del corazón. Valoración urgente para pericardiocentesis.",
+  per_tamponamiento: "⚠ Derrame pericárdico severo ({per_tamano} mm) con signos de tamponamiento cardíaco: colapso de cavidades derechas, VCI dilatada con reducción del colapso inspiratorio, variación respiratoria >25%. EMERGENCIA — pericardiocentesis urgente.",
+
+  // Strain VI/VD
+  str_normal: "Análisis de deformación miocárdica por speckle tracking 2D ({str_software_vi}). Strain longitudinal global del VI (GLS) de {str_gls_vi}%, dentro de límites de referencia (ASE/EACVI: ≤−18%). RVLS pared libre del VD: {str_rvls_libre}%, dentro de límites normales (referencia ≤−20%). Sin alteraciones segmentarias de la deformación.",
+  str_gls_leve: "GLS del VI levemente reducido: {str_gls_vi}% por {str_software_vi} (referencia ASE/EACVI ≤−18%). Reducción subclínica que puede preceder al deterioro de la FEVI convencional. Valor pronóstico independiente. Se recomienda seguimiento.",
+  str_gls_mod: "GLS del VI moderadamente reducido: {str_gls_vi}% por {str_software_vi} (referencia ≤−18%). Sugiere disfunción miocárdica subcelular con implicaciones pronósticas y terapéuticas, incluso en presencia de FEVI preservada.",
+  str_gls_sev: "GLS del VI severamente reducido: {str_gls_vi}% por {str_software_vi}. Deformación miocárdica global severamente comprometida. Valor pronóstico adverso independiente de la FEVI.",
+  str_rvls_normal: "RVLS pared libre del VD de {str_rvls_libre}%, dentro de límites normales (referencia ≤−20%). Función sistólica longitudinal del VD preservada.",
+  str_rvls_anormal: "RVLS pared libre del VD reducido: {str_rvls_libre}% (referencia ≤−20%). Disfunción sistólica longitudinal del VD. Valor pronóstico en hipertensión pulmonar y falla cardíaca derecha.",
+
+  // HP ESC 2022
+  hp_baja: "Los parámetros ecocardiográficos son compatibles con BAJA probabilidad de hipertensión pulmonar según criterios ESC/ERS 2022. Velocidad pico IT {vt_vel_it} m/s (PSAP estimada {vt_psap} mmHg). Sin signos de sobrecarga del VD ni criterios adicionales de HP.",
+  hp_intermedia: "Los hallazgos ecocardiográficos son compatibles con PROBABILIDAD INTERMEDIA de hipertensión pulmonar según ESC/ERS 2022. Velocidad pico IT {vt_vel_it} m/s (PSAP estimada {vt_psap} mmHg). Se recomienda correlación clínica y valoración por especialista para definir necesidad de cateterismo cardíaco derecho.",
+  hp_alta: "Los hallazgos ecocardiográficos indican ALTA probabilidad de hipertensión pulmonar según ESC/ERS 2022. Velocidad pico IT {vt_vel_it} m/s (PSAP estimada {vt_psap} mmHg). Múltiples criterios de soporte presentes. Se requiere cateterismo cardíaco derecho para confirmación diagnóstica.",
+  // Aurícula Derecha
+  ad_normal: "Aurícula derecha de dimensiones normales. Área {ad_area} cm², diámetro mayor {ad_diam_mayor} mm. Sin masas, trombos ni defectos septales evidentes.",
+  ad_dilatada_leve: "Aurícula derecha levemente dilatada. Área {ad_area} cm², diámetro mayor {ad_diam_mayor} mm. Sin masas ni trombos. El hallazgo puede estar en relación con sobrecarga de presión/volumen del ventrículo derecho.",
+  ad_dilatada_mod: "Aurícula derecha moderadamente dilatada. Área {ad_area} cm², diámetro mayor {ad_diam_mayor} mm. Hallazgo en contexto de sobrecarga crónica del corazón derecho. Se recomienda correlación con parámetros de función del VD y PSAP.",
+  ad_dilatada_sev: "Dilatación severa de la aurícula derecha. Área {ad_area} cm², diámetro mayor {ad_diam_mayor} mm. Severa sobrecarga del corazón derecho. Se recomienda estudio dirigido de hipertensión pulmonar y patología valvular tricuspídea.",
+  ad_fop: "Se documenta solución de continuidad en el septo interauricular a nivel del foramen oval, compatible con foramen oval permeable (FOP). Se recomienda correlación clínica y valoración según contexto (embolia paradójica, apnea del sueño, migraña con aura).",
+
+  hp_muy_alta: "Hallazgos compatibles con hipertensión arterial pulmonar severa. Velocidad pico IT {vt_vel_it} m/s (PSAP estimada {vt_psap} mmHg). Dilatación y disfunción significativa del VD. Probabilidad MUY ALTA (ESC/ERS 2022). Requiere manejo multidisciplinario urgente y cateterismo cardíaco derecho."
+};
+
+// ============================================================
+// REFERENCE RANGES (ASE)
+// ============================================================
+const REFS = {
+  vi_ddvi:      { M:{normal:[42,58],warn:[58,63]}, F:{normal:[38,52],warn:[52,58]} },
+  vi_dsvi:      { M:{normal:[0,40], warn:[40,45]}, F:{normal:[0,35], warn:[35,40]} },
+  vi_siv:       { M:{normal:[6,10], warn:[10,13]}, F:{normal:[6,9],  warn:[9,12]}  },
+  vi_pp:        { M:{normal:[6,10], warn:[10,13]}, F:{normal:[6,9],  warn:[9,12]}  },
+  vi_fevi:      { any:{normal:[53,100],warn:[40,53],alert:[0,40]} },
+  vi_vtd:       { M:{normal:[67,155],warn:[155,200]}, F:{normal:[56,104],warn:[104,150]} },
+  dia_tde:      { any:{normal:[150,200],warn:[200,280],alert:[280,9999]} },
+  dia_eprime_sep:{ any:{normal:[8,99], warn:[7,8], alert:[0,7]} },
+  dia_eprime_lat:{ any:{normal:[10,99],warn:[8,10],alert:[0,8]} },
+  ai_diam:      { M:{normal:[0,40],warn:[40,45]}, F:{normal:[0,38],warn:[38,42]} },
+  vd_tapse:     { any:{normal:[17,99],warn:[15,17],alert:[0,15]} },
+  vd_fac:       { any:{normal:[35,99],warn:[30,35],alert:[0,30]} },
+  vd_sprime:    { any:{normal:[9.5,99],warn:[8,9.5],alert:[0,8]} },
+  vd_diam:      { any:{normal:[0,41],warn:[41,45],alert:[45,999]} },
+  ao_senos:     { M:{normal:[0,40],warn:[40,45]}, F:{normal:[0,36],warn:[36,40]} },
+  ao_ascendente:{ any:{normal:[0,38],warn:[38,45],alert:[45,999]} },
+  ap_diam:      { any:{normal:[0,25],warn:[25,29],alert:[29,999]} }
+};
+
+function getStatus(id, val, sex) {
+  const ref = REFS[id]; if (!ref) return null;
+  const r = ref[sex] || ref.any || ref.M; if (!r) return null;
+  const v = parseFloat(val); if (isNaN(v)) return null;
+  // Lower-is-better fields
+  if (['vd_tapse','vd_fac','vd_sprime','dia_eprime_sep','dia_eprime_lat'].includes(id)) {
+    if (r.normal && v >= r.normal[0]) return 'normal';
+    if (r.warn   && v >= r.warn[0])   return 'warn';
+    return 'alert';
+  }
+  if (id === 'vi_fevi') {
+    if (v >= 53) return 'normal'; if (v >= 40) return 'warn'; return 'alert';
+  }
+  if (r.normal && v >= r.normal[0] && v <= r.normal[1]) return 'normal';
+  if (r.warn   && v >= r.warn[0]   && v <= r.warn[1])   return 'warn';
+  if (r.alert  && v >= r.alert[0]  && v <= r.alert[1])  return 'alert';
+  return null;
+}
+
+function applyStatus(inputId, stId, fieldId) {
+  const inp = document.getElementById(inputId);
+  const st  = document.getElementById(stId);
+  if (!inp) return;
+  const sex = document.getElementById('p_sexo')?.value || '';
+  inp.classList.remove('status-normal','status-warn','status-alert');
+  if (st) st.innerHTML = '';
+  const status = getStatus(fieldId, inp.value, sex);
+  if (!status) return;
+  inp.classList.add('status-' + status);
+  if (st) {
+    const lbl = {normal:'✓ Normal', warn:'⚠ Límite', alert:'✕ Anormal'};
+    const cls = {normal:'status-normal-txt', warn:'status-warn-txt', alert:'status-alert-txt'};
+    st.innerHTML = `<span class="${cls[status]}">${lbl[status]}</span>`;
+  }
+}
+
+// ============================================================
+// SC / IMC
+// ============================================================
+let sc = null;
+function calcSC() {
+  const p = parseFloat(document.getElementById('p_peso').value);
+  const t = parseFloat(document.getElementById('p_talla').value);
+  if (!isNaN(p) && !isNaN(t) && t > 0) {
+    sc = 0.007184 * Math.pow(p, 0.425) * Math.pow(t, 0.725);
+    document.getElementById('sc_val').textContent  = sc.toFixed(2) + ' m²';
+    document.getElementById('imc_val').textContent = (p / Math.pow(t/100, 2)).toFixed(1) + ' kg/m²';
+  } else {
+    sc = null;
+    document.getElementById('sc_val').textContent  = '— m²';
+    document.getElementById('imc_val').textContent = '— kg/m²';
+  }
+  recalcAll();
+}
+
+function recalcAll() {
+  evalVI(); evalDiastolic(); evalAI(); evalVD(); evalAD();
+  evalVM(); evalVA(); evalVT(); evalAo(); evalAPVCI();
+  evalPericardio(); evalStrain(); evalHP();
+}
+
+// ============================================================
+// VI
+// ============================================================
+function evalVI() {
+  ['vi_ddvi','vi_dsvi','vi_siv','vi_pp','vi_vtd'].forEach(f => applyStatus(f,'st_'+f,f));
+  applyStatus('vi_fevi','st_vi_fevi','vi_fevi');
+  const ddvi = parseFloat(document.getElementById('vi_ddvi').value);
+  const dsvi = parseFloat(document.getElementById('vi_dsvi').value);
+  const siv  = parseFloat(document.getElementById('vi_siv').value);
+  const pp   = parseFloat(document.getElementById('vi_pp').value);
+  // FA
+  const faEl = document.getElementById('vi_fa_val');
+  if (!isNaN(ddvi) && !isNaN(dsvi) && ddvi > 0)
+    faEl.textContent = ((ddvi-dsvi)/ddvi*100).toFixed(1) + ' %';
+  else faEl.textContent = '—';
+  // Masa + geometría
+  if (!isNaN(ddvi) && !isNaN(siv) && !isNaN(pp)) {
+    const masa = 0.8*1.04*(Math.pow(ddvi+siv+pp,3)-Math.pow(ddvi,3))/1000+0.6;
+    document.getElementById('vi_masa_val').textContent = masa.toFixed(0) + ' g';
+    if (sc) {
+      const mi = masa/sc;
+      document.getElementById('vi_masai_val').textContent = mi.toFixed(0) + ' g/m²';
+      const irp = (2*pp)/ddvi;
+      document.getElementById('vi_irp_val').textContent = irp.toFixed(2);
+      const sex = document.getElementById('p_sexo').value;
+      const um = sex==='F' ? 95 : 115;
+      const patron = mi<=um && irp<=0.42 ? 'Normal'
+        : mi<=um && irp>0.42 ? 'Remodelado concéntrico'
+        : mi>um  && irp<=0.42 ? 'Hipertrofia excéntrica'
+        : 'Hipertrofia concéntrica';
+      document.getElementById('vi_patron_val').textContent = patron;
+    } else {
+      document.getElementById('vi_masai_val').textContent = '— g/m²';
+      document.getElementById('vi_patron_val').textContent = '—';
+      document.getElementById('vi_irp_val').textContent = '—';
+    }
+  } else {
+    ['vi_masa_val','vi_masai_val','vi_irp_val','vi_patron_val'].forEach(id => {
+      document.getElementById(id).textContent = '—';
+    });
+  }
+  updateSectionBadge('s2');
+}
+
+// ============================================================
+// DIASTÓLICA
+// ============================================================
+function evalDiastolic() {
+  const E   = parseFloat(document.getElementById('dia_E').value);
+  const A   = parseFloat(document.getElementById('dia_A').value);
+  const ep_sep = parseFloat(document.getElementById('dia_eprime_sep').value);
+  const ep_lat = parseFloat(document.getElementById('dia_eprime_lat').value);
+  applyStatus('dia_tde','st_dia_tde','dia_tde');
+  applyStatus('dia_eprime_sep','st_dia_ep_sep','dia_eprime_sep');
+  applyStatus('dia_eprime_lat','st_dia_ep_lat','dia_eprime_lat');
+  const eaEl = document.getElementById('dia_ea_val');
+  const eeEl = document.getElementById('dia_ee_val');
+  let ea = NaN, ee = NaN;
+  if (!isNaN(E) && !isNaN(A) && A>0) { ea = E/A; eaEl.textContent = ea.toFixed(2); }
+  else eaEl.textContent = '—';
+  if (!isNaN(E) && (!isNaN(ep_sep) || !isNaN(ep_lat))) {
+    const epMed = (!isNaN(ep_sep) && !isNaN(ep_lat)) ? (ep_sep+ep_lat)/2
+                : !isNaN(ep_sep) ? ep_sep : ep_lat;
+    ee = (E*100)/epMed; eeEl.textContent = ee.toFixed(1);
+  } else eeEl.textContent = '—';
+  // ASE 2016 classification
+  let crit = [], pos = 0;
+  if (!isNaN(ep_sep) && ep_sep < 7)  { crit.push("e' sep <7");    pos++; }
+  if (!isNaN(ep_lat) && ep_lat < 10) { crit.push("e' lat <10");   pos++; }
+  if (!isNaN(ee) && ee > 14)         { crit.push("E/e' >14");     pos++; }
+  const aiVol = parseFloat(document.getElementById('ai_vol')?.value);
+  if (!isNaN(aiVol) && sc && (aiVol/sc) > 34) { crit.push("Vol AI >34"); pos++; }
+  const vIT = parseFloat(document.getElementById('vt_vel_it')?.value);
+  if (!isNaN(vIT) && vIT > 2.8) { crit.push("VT IT >2.8"); pos++; }
+  let grado = '—';
+  if (!isNaN(E)) {
+    if (pos === 0) grado = 'Normal';
+    else if (pos === 1) grado = 'Indeterminado';
+    else {
+      if (!isNaN(ea)) {
+        if (ea <= 0.8) grado = 'Disfunción Grado I';
+        else if (ea <= 2.0 && !isNaN(ee) && ee > 14) grado = 'Disfunción Grado II';
+        else if (ea > 2.0) grado = 'Disfunción Grado III';
+        else grado = 'Disfunción Grado I–II';
+      }
+    }
+  }
+  document.getElementById('dia_grado').textContent = grado;
+  document.getElementById('dia_criterios').textContent = crit.length ? crit.join(' | ') : 'Ninguno';
+  updateSectionBadge('s3');
+}
+
+// ============================================================
+// AI
+// ============================================================
+function evalAI() {
+  applyStatus('ai_diam','st_ai_diam','ai_diam');
+  const vol = parseFloat(document.getElementById('ai_vol').value);
+  if (!isNaN(vol) && sc) {
+    const vi = vol/sc;
+    document.getElementById('ai_voli_val').textContent = vi.toFixed(1) + ' mL/m²';
+    const estado = vi<=34 ? 'Normal (≤34 mL/m²)' : vi<=41 ? 'Levemente dilatada' : vi<=48 ? 'Moderadamente dilatada' : 'Severamente dilatada';
+    document.getElementById('ai_estado_val').textContent = estado;
+  } else {
+    document.getElementById('ai_voli_val').textContent = '— mL/m²';
+    document.getElementById('ai_estado_val').textContent = '—';
+  }
+  updateSectionBadge('s4');
+  evalDiastolic();
+}
+
+// ============================================================
+// VD
+// ============================================================
+function evalVD() {
+  ['vd_tapse','vd_fac','vd_sprime','vd_diam'].forEach(f => applyStatus(f,'st_'+f,f));
+
+  // Diámetro medio (normal ≤33 mm ASE)
+  const dm = parseFloat(document.getElementById('vd_diam_medio').value);
+  const dmInp = document.getElementById('vd_diam_medio');
+  const dmSt  = document.getElementById('st_vd_diam_medio');
+  if (dmInp) dmInp.classList.remove('status-normal','status-warn','status-alert');
+  if (!isNaN(dm) && dmSt) {
+    if      (dm <= 33) { dmInp.classList.add('status-normal'); dmSt.innerHTML='<span class="status-normal-txt">✓ Normal (≤33 mm)</span>'; }
+    else if (dm <= 38) { dmInp.classList.add('status-warn');   dmSt.innerHTML='<span class="status-warn-txt">⚠ Límite (33–38 mm)</span>'; }
+    else               { dmInp.classList.add('status-alert');  dmSt.innerHTML='<span class="status-alert-txt">✕ Dilatado (>38 mm)</span>'; }
+  } else if (dmSt) dmSt.innerHTML = '';
+
+  // Diámetro longitudinal (normal ≤83 mm ASE)
+  const dl = parseFloat(document.getElementById('vd_diam_long').value);
+  const dlInp = document.getElementById('vd_diam_long');
+  const dlSt  = document.getElementById('st_vd_diam_long');
+  if (dlInp) dlInp.classList.remove('status-normal','status-warn','status-alert');
+  if (!isNaN(dl) && dlSt) {
+    if      (dl <= 83) { dlInp.classList.add('status-normal'); dlSt.innerHTML='<span class="status-normal-txt">✓ Normal (≤83 mm)</span>'; }
+    else               { dlInp.classList.add('status-alert');  dlSt.innerHTML='<span class="status-alert-txt">✕ Elongado (>83 mm)</span>'; }
+  } else if (dlSt) dlSt.innerHTML = '';
+
+  // Grosor pared libre (normal ≤5 mm — hipertrofia si >5)
+  const gv = parseFloat(document.getElementById('vd_grosor').value);
+  const gvInp = document.getElementById('vd_grosor');
+  const gvSt  = document.getElementById('st_vd_grosor');
+  if (gvInp) gvInp.classList.remove('status-normal','status-warn','status-alert');
+  if (!isNaN(gv) && gvSt) {
+    if (gv <= 5) { gvInp.classList.add('status-normal'); gvSt.innerHTML='<span class="status-normal-txt">✓ Normal (≤5 mm)</span>'; }
+    else         { gvInp.classList.add('status-alert');  gvSt.innerHTML='<span class="status-alert-txt">✕ Hipertrofia (>5 mm)</span>'; }
+  } else if (gvSt) gvSt.innerHTML = '';
+
+  updateSectionBadge('s5');
+}
+
+// ============================================================
+// AURÍCULA DERECHA
+// ============================================================
+function evalAD() {
+  const area  = parseFloat(document.getElementById('ad_area').value);
+  const diam  = parseFloat(document.getElementById('ad_diam_mayor').value);
+  const tamEl = document.getElementById('ad_tamano_val');
+  const stEl  = document.getElementById('st_ad_area');
+
+  // Classify by area (ASE 2015: normal <18 cm², mild 18-25, mod 25-32, sev >32)
+  if (!isNaN(area)) {
+    let label, css;
+    if      (area < 18) { label='Normal (<18 cm²)';         css='status-normal-txt'; }
+    else if (area < 25) { label='⚠ Dilatada leve (18–25)';  css='status-warn-txt';   }
+    else if (area < 32) { label='✕ Dilatada mod. (25–32)';  css='status-alert-txt';  }
+    else                { label='✕ Dilatada severa (>32)';   css='status-alert-txt';  }
+    if (tamEl) tamEl.textContent = label;
+    if (stEl)  stEl.innerHTML = `<span class="${css}">${label}</span>`;
+  } else {
+    if (tamEl) tamEl.textContent = '—';
+    if (stEl)  stEl.innerHTML = '';
+  }
+
+  // Trombo alert
+  const trombo = document.getElementById('ad_trombo').value;
+  const badge  = document.getElementById('badge-sad');
+  if (badge) {
+    if (trombo === 'si' || trombo === 'sospecha') {
+      badge.className = 'section-badge badge-alert';
+      badge.textContent = '⚠ Trombo';
+    }
+  }
+  updateSectionBadge('sad');
+}
+
+// ============================================================
+// VÁLVULA MITRAL
+// ============================================================
+function evalVM() {
+  const area = parseFloat(document.getElementById('vm_area_pht').value);
+  const st = document.getElementById('st_vm_area');
+  if (st) {
+    if (!isNaN(area)) {
+      const [lbl,cls] = area>=1.5 ? ['✓ Sin estenosis significativa','status-normal-txt']
+        : area>=1.0 ? ['⚠ EM moderada (1.0–1.5 cm²)','status-warn-txt']
+        : ['✕ EM severa (<1.0 cm²)','status-alert-txt'];
+      st.innerHTML = `<span class="${cls}">${lbl}</span>`;
+    } else st.innerHTML = '';
+  }
+  updateSectionBadge('s6');
+}
+
+// ============================================================
+// VÁLVULA AÓRTICA
+// ============================================================
+function evalVA() {
+  const vtiTSVI = parseFloat(document.getElementById('va_vti_tsvi').value);
+  const dTSVI   = parseFloat(document.getElementById('va_dtsvi').value);
+  const vtiAo   = parseFloat(document.getElementById('va_vti_ao').value);
+  const gmax    = parseFloat(document.getElementById('va_gmax').value);
+  if (!isNaN(vtiTSVI) && !isNaN(dTSVI) && !isNaN(vtiAo) && vtiAo > 0) {
+    const ava = (Math.PI * Math.pow(dTSVI/20,2) * vtiTSVI) / vtiAo;
+    document.getElementById('va_ava_val').textContent = ava.toFixed(2) + ' cm²';
+    let sev = '—';
+    if      (ava > 1.5 || (!isNaN(gmax) && gmax < 25)) sev = 'Sin EA / mínima';
+    else if (ava >= 1.0 && (!isNaN(gmax) && gmax < 40)) sev = 'EA leve';
+    else if (ava >= 1.0) sev = 'EA moderada';
+    else if (!isNaN(gmax) && gmax >= 40) sev = '⚠ EA severa (AVA<1 cm², Gm≥40)';
+    else sev = 'EA severa (AVA <1.0 cm²)';
+    document.getElementById('va_ea_sev').textContent = sev;
+  } else {
+    document.getElementById('va_ava_val').textContent = '— cm²';
+    document.getElementById('va_ea_sev').textContent = '—';
+  }
+  updateSectionBadge('s7');
+}
+
+// ============================================================
+// VÁLVULA TRICÚSPIDE — PSAP
+// ============================================================
+function evalVT() {
+  const vel = parseFloat(document.getElementById('vt_vel_it').value);
+  const pad = parseFloat(document.getElementById('vt_pad').value) || 5;
+  if (!isNaN(vel)) {
+    const psap = 4*vel*vel + pad;
+    document.getElementById('vt_psap_val').textContent = psap.toFixed(0) + ' mmHg';
+  } else {
+    document.getElementById('vt_psap_val').textContent = '— mmHg';
+  }
+  updateSectionBadge('s8');
+  evalHP();
+}
+
+// ============================================================
+// AORTA
+// ============================================================
+function evalAo() {
+  applyStatus('ao_senos','st_ao_senos','ao_senos');
+  applyStatus('ao_ascendente','st_ao_asc','ao_ascendente');
+  updateSectionBadge('s10');
+}
+
+// ============================================================
+// AP / VCI
+// ============================================================
+function evalAPVCI() {
+  const vciDiam = parseFloat(document.getElementById('vci_diam').value);
+  const vciCol  = document.getElementById('vci_colapso').value;
+  let pad = 10;
+  if (vciDiam <= 21 && vciCol === '>50') pad = 5;
+  else if (vciDiam > 21 && vciCol === '<50') pad = 15;
+  else if (vciCol === 'ausente') pad = 20;
+  document.getElementById('vci_pad_val').textContent = pad + ' mmHg';
+  applyStatus('ap_diam','st_ap_diam','ap_diam');
+  updateSectionBadge('s11');
+  evalHP();
+}
+
+// ============================================================
+// PERICARDIO
+// ============================================================
+function evalPericardio() {
+  const der  = document.getElementById('per_derrame').value;
+  const tamp = document.getElementById('per_tamponade').value;
+  const badge = document.getElementById('badge-s12');
+  if (!badge) return;
+  if (tamp !== 'no') { badge.className='section-badge badge-alert'; badge.textContent='⚠ Tamponamiento'; }
+  else if (der === 'no') { badge.className='section-badge badge-normal'; badge.textContent='Normal'; }
+  else if (der === 'minimo' || der === 'leve') { badge.className='section-badge badge-warn'; badge.textContent='Derrame '+der; }
+  else { badge.className='section-badge badge-alert'; badge.textContent='Derrame '+der; }
+}
+
+// ============================================================
+// STRAIN VI / VD
+// ============================================================
+function evalStrain() {
+  const gls      = parseFloat(document.getElementById('str_gls_vi').value);
+  const rvlsGlob = parseFloat(document.getElementById('str_rvls_global').value);
+  const rvlsLib  = parseFloat(document.getElementById('str_rvls_libre').value);
+
+  // GLS VI
+  const inpGLS  = document.getElementById('str_gls_vi');
+  const stGLS   = document.getElementById('st_str_gls_vi');
+  const interp  = document.getElementById('str_gls_interp');
+  const patron  = document.getElementById('str_gls_patron');
+  inpGLS.classList.remove('status-normal','status-warn','status-alert');
+  if (!isNaN(gls)) {
+    let label, css, pat, itp;
+    if      (gls <= -18) { label='✓ Normal (≤ −18%)';           css='status-normal-txt'; pat='Normal';           itp='GLS normal — deformación preservada';              inpGLS.classList.add('status-normal'); }
+    else if (gls <= -16) { label='⚠ Levemente reducido';         css='status-warn-txt';   pat='Reducción leve';   itp='GLS leve. reducido — disfunción subclínica posible'; inpGLS.classList.add('status-warn');   }
+    else if (gls <= -12) { label='✕ Moderadamente reducido';     css='status-alert-txt';  pat='Reducción mod.';   itp='GLS mod. reducido — disfunción miocárdica';         inpGLS.classList.add('status-alert');  }
+    else                 { label='✕ Severamente reducido';       css='status-alert-txt';  pat='Reducción severa'; itp='GLS sev. reducido — disfunción sistólica severa';   inpGLS.classList.add('status-alert');  }
+    if (stGLS)  stGLS.innerHTML = `<span class="${css}">${label}</span>`;
+    if (patron) patron.textContent = pat;
+    if (interp) { interp.textContent = itp; interp.style.color = css==='status-normal-txt'?'var(--green)':css==='status-warn-txt'?'var(--yellow)':'var(--red)'; }
+  } else {
+    if (stGLS)  stGLS.innerHTML = '';
+    if (patron) patron.textContent = '—';
+    if (interp) { interp.textContent = '—'; interp.style.color = ''; }
+  }
+
+  // RVLS
+  function applyRVLS(val, inpId, stId) {
+    const inp = document.getElementById(inpId);
+    const st  = document.getElementById(stId);
+    if (!inp) return;
+    inp.classList.remove('status-normal','status-warn','status-alert');
+    if (isNaN(val)) { if(st) st.innerHTML=''; return; }
+    let label, css;
+    if      (val <= -20) { label='✓ Normal (≤ −20%)';  css='status-normal-txt'; inp.classList.add('status-normal'); }
+    else if (val <= -17) { label='⚠ Limítrofe';        css='status-warn-txt';   inp.classList.add('status-warn');   }
+    else                 { label='✕ Reducido (>−20%)'; css='status-alert-txt';  inp.classList.add('status-alert');  }
+    if (st) st.innerHTML = `<span class="${css}">${label}</span>`;
+  }
+  applyRVLS(rvlsGlob, 'str_rvls_global', 'st_str_rvls');
+  applyRVLS(rvlsLib,  'str_rvls_libre',  'st_str_rvls_lib');
+  const interpR = document.getElementById('str_rvls_interp');
+  if (interpR) {
+    const ref = !isNaN(rvlsLib) ? rvlsLib : rvlsGlob;
+    if (!isNaN(ref)) {
+      interpR.textContent = ref <= -20 ? 'RVLS normal — función VD preservada' : 'RVLS reducido — disfunción longitudinal VD';
+      interpR.style.color = ref <= -20 ? 'var(--green)' : 'var(--red)';
+    } else { interpR.textContent = '—'; interpR.style.color = ''; }
+  }
+  updateSectionBadge('s14');
+}
+
+// ============================================================
+// HIPERTENSIÓN PULMONAR — ESC/ERS 2022
+// ============================================================
+function evalHP() {
+  const velIT = parseFloat(document.getElementById('vt_vel_it').value);
+  const pad   = parseFloat(document.getElementById('vt_pad')?.value) || 5;
+  const psap  = !isNaN(velIT) ? (4*velIT*velIT + pad) : null;
+
+  const velDisp = document.getElementById('hp_vel_display');
+  if (velDisp) velDisp.textContent = !isNaN(velIT)
+    ? velIT.toFixed(2) + ' m/s → PSAP ' + psap.toFixed(0) + ' mmHg'
+    : '— (ingresar velocidad IT en sección Tricúspide)';
+
+  const catA = ['hp_a1','hp_a2','hp_a3','hp_a4'].filter(id=>document.getElementById(id)?.checked).length;
+  const catB = ['hp_b1','hp_b2','hp_b3','hp_b4'].filter(id=>document.getElementById(id)?.checked).length;
+  const catC = ['hp_c1','hp_c2','hp_c3','hp_c4'].filter(id=>document.getElementById(id)?.checked).length;
+  const catEl = document.getElementById('hp_categorias');
+  if (catEl) catEl.textContent = catA + ' / ' + catB + ' / ' + catC;
+
+  const total = catA + catB + catC;
+  let prob = '—', criterio = '—', color = 'var(--text2)';
+  if (!isNaN(velIT)) {
+    if      (velIT <= 2.8) { if(total===0){prob='BAJA';color='var(--green)';criterio='Vel IT ≤2.8 m/s sin hallazgos adicionales';} else if(total===1){prob='INTERMEDIA';color='var(--yellow)';criterio='Vel IT ≤2.8 m/s + 1 hallazgo adicional';} else{prob='ALTA';color='var(--red)';criterio='Vel IT ≤2.8 m/s + ≥2 hallazgos adicionales';} }
+    else if (velIT <= 3.4) { if(total===0){prob='INTERMEDIA';color='var(--yellow)';criterio='Vel IT 2.9–3.4 m/s sin hallazgos adicionales';} else{prob='ALTA';color='var(--red)';criterio='Vel IT 2.9–3.4 m/s + ≥1 hallazgo adicional';} }
+    else                   { prob='ALTA'; color='var(--red)'; criterio='Vel IT >3.4 m/s'; }
+  } else if (total >= 3) {
+    prob='INTERMEDIA*'; color='var(--yellow)'; criterio='Sin Vel IT medible + ≥3 hallazgos sugestivos';
+  }
+  const probEl = document.getElementById('hp_probabilidad');
+  if (probEl) { probEl.textContent = prob; probEl.style.color = color; }
+  const critEl = document.getElementById('hp_criterio_aplicado');
+  if (critEl) critEl.textContent = criterio;
+
+  // TAPSE/PSAP
+  const tapse = parseFloat(document.getElementById('vd_tapse')?.value);
+  const tpEl  = document.getElementById('hp_tapse_psap');
+  if (tpEl) {
+    if (!isNaN(tapse) && psap) {
+      const r = (tapse/psap).toFixed(3);
+      tpEl.textContent = r + ' mm/mmHg';
+      tpEl.style.color = parseFloat(r) < 0.55 ? 'var(--red)' : 'var(--green)';
+    } else { tpEl.textContent = '—'; tpEl.style.color = ''; }
+  }
+
+  // AP/Ao ratio
+  const apD   = parseFloat(document.getElementById('ap_diam')?.value);
+  const aoAn  = parseFloat(document.getElementById('ao_anillo')?.value);
+  const apAoEl = document.getElementById('hp_ap_ao_ratio');
+  if (apAoEl) {
+    if (!isNaN(apD) && !isNaN(aoAn) && aoAn > 0) {
+      const r = (apD/aoAn).toFixed(2);
+      apAoEl.textContent = r;
+      apAoEl.style.color = parseFloat(r) > 1 ? 'var(--red)' : 'var(--green)';
+    } else { apAoEl.textContent = '—'; apAoEl.style.color = ''; }
+  }
+
+  // Badge
+  const badge = document.getElementById('badge-s15');
+  if (badge && prob !== '—') {
+    if   (prob.includes('ALTA'))  { badge.className='section-badge badge-alert'; badge.textContent='HP '+prob; }
+    else if(prob.includes('INT')) { badge.className='section-badge badge-warn';  badge.textContent='HP '+prob; }
+    else                          { badge.className='section-badge badge-normal'; badge.textContent='HP '+prob; }
+  }
+  updateSectionBadge('s15');
+}
+
+// ============================================================
+// SECTION BADGE
+// ============================================================
+function updateSectionBadge(sId) {
+  const card  = document.getElementById(sId);
+  const badge = document.getElementById('badge-' + sId);
+  if (!card || !badge) return;
+  const inputs = card.querySelectorAll('.field-input,.field-select,.field-textarea');
+  let hasData = false, hasAlert = false, hasWarn = false;
+  inputs.forEach(inp => {
+    if (inp.value && inp.value !== '') {
+      hasData = true;
+      if (inp.classList.contains('status-alert')) hasAlert = true;
+      if (inp.classList.contains('status-warn'))  hasWarn  = true;
+    }
+  });
+  if (!hasData) { badge.className='section-badge badge-empty'; badge.textContent='—'; return; }
+  if (hasAlert) { badge.className='section-badge badge-alert'; badge.textContent='Anormal'; }
+  else if (hasWarn) { badge.className='section-badge badge-warn'; badge.textContent='Límite'; }
+  else { badge.className='section-badge badge-normal'; badge.textContent='Normal'; }
+  const navDot = document.querySelector(`#nav-${sId} .nav-dot`);
+  if (navDot) navDot.style.background = hasAlert ? 'var(--red)' : hasWarn ? 'var(--yellow)' : 'var(--green)';
+}
+
+// ============================================================
+// PATIENT DISPLAY
+// ============================================================
+function updatePatientDisplay() {
+  const nombre  = document.getElementById('p_nombre').value || '—';
+  const edad    = document.getElementById('p_edad').value;
+  const sexo    = document.getElementById('p_sexo').value;
+  const fecha   = document.getElementById('p_fecha').value;
+  const ind     = document.getElementById('p_indicacion').value;
+  const idTipoEl = document.getElementById('p_id_tipo');
+  const idTipo  = idTipoEl && idTipoEl.selectedIndex > 0 ? idTipoEl.options[idTipoEl.selectedIndex].value : '';
+  const idNum   = document.getElementById('p_id_num').value || '';
+  const idStr   = idTipo && idNum ? `${idTipo} ${idNum}` : (idNum || '');
+  document.getElementById('printSubtitle').textContent =
+    `${nombre}  |  ${idStr ? idStr + '  |  ' : ''}${edad?edad+' años  |  ':''}${sexo==='M'?'Masculino  |  ':sexo==='F'?'Femenino  |  ':''}${fecha||''}`;
+  const rows = [];
+  const idTipoDisp = document.getElementById('p_id_tipo');
+  const idTipoVal  = idTipoDisp && idTipoDisp.selectedIndex > 0 ? idTipoDisp.options[idTipoDisp.selectedIndex].value : '';
+  const idNumVal   = document.getElementById('p_id_num').value || '';
+  if (nombre !== '—') rows.push(`<span style="display:flex;gap:4pt"><strong>Paciente:</strong> ${nombre}</span>`);
+  if (idTipoVal && idNumVal) rows.push(`<span style="display:flex;gap:4pt"><strong>${idTipoVal}:</strong> ${idNumVal}</span>`);
+  else if (idNumVal) rows.push(`<span style="display:flex;gap:4pt"><strong>ID:</strong> ${idNumVal}</span>`);
+  if (edad)   rows.push(`<span style="display:flex;gap:4pt"><strong>Edad:</strong> ${edad} años</span>`);
+  if (sexo)   rows.push(`<span style="display:flex;gap:4pt"><strong>Sexo:</strong> ${sexo==='M'?'Masculino':'Femenino'}</span>`);
+  if (ind)    rows.push(`<span style="display:flex;gap:4pt;flex-basis:100%"><strong>Indicación:</strong> ${ind}</span>`);
+  document.getElementById('printPatientRow').innerHTML = rows.join('');
+  updateSectionBadge('s0');
+}
+
+// ============================================================
+// LOAD PREFORMAT
+// ============================================================
+function loadPreformat(taId, key) {
+  const ta = document.getElementById(taId);
+  if (!ta) return;
+  let text = PF[key] || '';
+  const g = id => document.getElementById(id)?.value || '___';
+  const gc = id => document.getElementById(id)?.textContent?.trim() || '___';
+  const vars = {
+    ct_ritmo: g('ct_ritmo'), ct_ventana: g('ct_ventana'),
+    vi_ddvi: g('vi_ddvi'), vi_dsvi: g('vi_dsvi'), vi_siv: g('vi_siv'), vi_pp: g('vi_pp'),
+
+    vi_fevi: g('vi_fevi'), vi_vtd: g('vi_vtd'), vi_vts: g('vi_vts'),
+    dia_E: g('dia_E'), dia_A: g('dia_A'), dia_tde: g('dia_tde'),
+    dia_eprime_sep: g('dia_eprime_sep'), dia_eprime_lat: g('dia_eprime_lat'),
+    ea_ratio: gc('dia_ea_val'), ee_ratio: gc('dia_ee_val'),
+    ai_diam: g('ai_diam'), ai_voli: gc('ai_voli_val').replace(' mL/m²',''),
+    vd_tapse: g('vd_tapse'), vd_fac: g('vd_fac'), vd_sprime: g('vd_sprime'), vd_diam: g('vd_diam'), vd_diam_medio: g('vd_diam_medio'), vd_diam_long: g('vd_diam_long'), vd_grosor: g('vd_grosor'),
+    vm_gmedio: g('vm_gmedio'), vm_area_pht: g('vm_area_pht'), vm_pht: g('vm_pht'),
+    vm_rm_grado: g('vm_rm_grado'), vm_carpentier: g('vm_carpentier'), vm_ero: g('vm_ero'), vm_volreg: g('vm_volreg'),
+    va_gmax: g('va_gmax'), va_gmedio: g('va_gmedio'),
+    va_ava: gc('va_ava_val').replace(' cm²',''),
+    va_vti_tsvi: g('va_vti_tsvi'), va_dtsvi: g('va_dtsvi'), va_vti_ao: g('va_vti_ao'),
+    va_ra_grado: (()=>{ const e=document.getElementById('va_ra_grado'); return e&&e.value?e.value:'—'; })(), va_ra_ratio: g('va_ra_ratio'), va_pht_ra: g('va_pht_ra'),
+    vt_it_grado: g('vt_it_grado'), vt_vel_it: g('vt_vel_it'),
+    vt_psap: gc('vt_psap_val').replace(' mmHg',''), vt_pad_val: g('vt_pad'),
+    vp_vel: g('vp_vel'), vp_gmedio: g('vp_gmedio'),
+    ao_senos: g('ao_senos'), ao_ust: g('ao_ust'), ao_ascendente: g('ao_ascendente'),
+    ap_diam: g('ap_diam'), vci_diam: g('vci_diam'),
+    vci_colapso: (()=>{ const e=document.getElementById('vci_colapso'); return e&&e.selectedIndex>0?e.options[e.selectedIndex].text:'—'; })(),
+    vci_pad: gc('vci_pad_val').replace(' mmHg',''),
+    per_tamano: g('per_tamano'), per_loc: g('per_loc'),
+    ad_area: g('ad_area'), ad_diam_mayor: g('ad_diam_mayor'),
+    vi_patron_val: gc('vi_patron_val'),
+    vi_masai_val: gc('vi_masai_val').replace(' g/m²',''),
+    va_ava_val: gc('va_ava_val').replace(' cm²',''),
+    vm_morfologia: (()=>{ const e=document.getElementById('vm_morfologia'); return e&&e.selectedIndex>0?e.options[e.selectedIndex].text:'—'; })(),
+    va_morfologia: (()=>{ const e=document.getElementById('va_morfologia'); return e&&e.selectedIndex>0?e.options[e.selectedIndex].text:'—'; })(),
+    vt_morfologia: (()=>{ const e=document.getElementById('vt_morfologia'); return e&&e.selectedIndex>0?e.options[e.selectedIndex].text:'—'; })(),
+    vt_pad_val: (()=>{ const e=document.getElementById('vt_pad'); return e&&e.selectedIndex>0?e.options[e.selectedIndex].text:'5'; })(),
+    str_gls_vi: g('str_gls_vi'), str_rvls_libre: g('str_rvls_libre'),
+    str_rvls_global: g('str_rvls_global'), str_software_vi: g('str_software_vi') || '2D-STE'
+  };
+  Object.keys(vars).forEach(k => {
+    text = text.replace(new RegExp('\\{'+k+'\\}','g'), vars[k]);
+  });
+  ta.value = text;
+  ta.style.height = 'auto';
+  ta.style.height = Math.max(ta.scrollHeight, 80) + 'px';
+}
+
+// ============================================================
+// TOGGLE SECTION
+// ============================================================
+function toggleSection(id) {
+  document.getElementById(id)?.classList.toggle('collapsed');
+}
+
+function scrollToSection(id) {
+  document.getElementById(id)?.scrollIntoView({behavior:'smooth', block:'start'});
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('nav-'+id)?.classList.add('active');
+}
+
+// ============================================================
+// GENERATE CONCLUSIONS
+// ============================================================
+function generateConclusions() {
+  const lines = [];
+  const nombre = document.getElementById('p_nombre').value;
+  const edad   = document.getElementById('p_edad').value;
+  if (nombre || edad)
+    lines.push(`INFORME ECOCARDIOGRÁFICO${nombre?' — '+nombre:''}${edad?', '+edad+' años':''}\n`);
+
+  // 1. Función sistólica VI
+  const fevi  = parseFloat(document.getElementById('vi_fevi').value);
+  const ddvi  = parseFloat(document.getElementById('vi_ddvi').value);
+  const patron = document.getElementById('vi_patron_val')?.textContent;
+  if (!isNaN(fevi)) {
+    let s = fevi>=53?'Función sistólica del VI conservada':fevi>=40?'Disfunción sistólica leve del VI':fevi>=30?'Disfunción sistólica moderada del VI':'Disfunción sistólica severa del VI';
+    s += ` (FEVI ${fevi}%)`;
+    if (patron && patron!=='—' && patron!=='Normal') s += `. Patrón: ${patron}`;
+    lines.push(s + '.');
+  }
+  const sex = document.getElementById('p_sexo').value;
+  if (!isNaN(ddvi) && ddvi > (sex==='F'?52:58)) lines.push(`Dilatación del VI (DDVI ${ddvi} mm).`);
+
+  // 1b. Trastornos segmentarios
+  const segRows = getSegRows().filter(r => r.mot && r.ter);
+  if (segRows.length > 0) {
+    const motLabels = {
+      hipo_leve:'Hipocinesia leve', hipo_mod:'Hipocinesia moderada',
+      hipo_sev:'Hipocinesia severa', hipo_glob:'Hipocinesia global',
+      acinesia:'Acinesia', discinesia:'Discinesia', aneurisma:'Aneurisma segmentario'
+    };
+    const descrips = segRows.map(r => {
+      let s = (motLabels[r.mot]||r.mot) + ' en ' + r.ter;
+      if (r.ext) s += ' (' + r.ext + ')';
+      return s;
+    });
+    lines.push('Trastornos segmentarios: ' + descrips.join('; ') + '. Correlacionar con cardiopatía isquémica.');
+  }
+
+  // 2. Función diastólica
+  const grado = document.getElementById('dia_grado')?.textContent;
+  if (grado && grado !== '—') lines.push(`Función diastólica: ${grado}.`);
+
+  // 3. AI
+  const aiEst = document.getElementById('ai_estado_val')?.textContent;
+  if (aiEst && aiEst !== '—' && !aiEst.includes('Normal')) lines.push(`Aurícula izquierda: ${aiEst}.`);
+
+  // 4. VD
+  const tapse = parseFloat(document.getElementById('vd_tapse').value);
+  const fac   = parseFloat(document.getElementById('vd_fac').value);
+  const vdD   = parseFloat(document.getElementById('vd_diam').value);
+  if (!isNaN(tapse) || !isNaN(fac)) {
+    const anom = (!isNaN(tapse)&&tapse<17) || (!isNaN(fac)&&fac<35);
+    let s = anom
+      ? `Disfunción sistólica del VD (TAPSE ${isNaN(tapse)?'—':tapse} mm, FAC ${isNaN(fac)?'—':fac}%)`
+      : `Función sistólica del VD conservada (TAPSE ${isNaN(tapse)?'—':tapse} mm)`;
+    if (!isNaN(vdD) && vdD > 41) s += `. VD dilatado (${vdD} mm)`;
+    lines.push(s + '.');
+  }
+
+  // 4b. Aurícula Derecha
+  const adArea = parseFloat(document.getElementById('ad_area').value);
+  const adTrombo = document.getElementById('ad_trombo').value;
+  if (adTrombo === 'si') lines.push('⚠ Trombo en aurícula derecha documentado — anticoagulación y valoración urgente.');
+  else if (adTrombo === 'sospecha') lines.push('Sospecha de trombo en aurícula derecha — requiere confirmación con ecocardiografía transesofágica.');
+  if (!isNaN(adArea) && adArea >= 18) {
+    const g = adArea>=32?'severa':adArea>=25?'moderada':'leve';
+    lines.push(`Dilatación ${g} de la aurícula derecha (área ${adArea} cm²).`);
+  }
+  const adCIA = document.getElementById('ad_cia').value;
+  if (adCIA && adCIA !== 'no') {
+    const cias = {cia_os:'CIA ostium secundum',cia_op:'CIA ostium primum',fop:'Foramen oval permeable (FOP)',sospecha:'Sospecha de defecto septal interauricular — requiere contraste'};
+    lines.push((cias[adCIA]||adCIA) + '.');
+  }
+
+  // 5. PSAP / HP
+  const psapTxt = document.getElementById('vt_psap_val')?.textContent;
+  const psapNum = psapTxt ? parseFloat(psapTxt) : NaN;
+  if (!isNaN(psapNum) && psapNum > 35) {
+    const g = psapNum>70?'severa':psapNum>50?'moderada':'leve';
+    lines.push(`Hipertensión arterial pulmonar ${g} estimada (PSAP ${psapTxt}).`);
+  }
+
+  // 6. VM
+  const vmGrado = document.getElementById('vm_rm_grado').value;
+  const vmArea  = parseFloat(document.getElementById('vm_area_pht').value);
+  if (vmGrado && vmGrado!=='' && vmGrado!=='0') {
+    const g = {1:'leve',2:'moderada',3:'moderada-severa',4:'severa'};
+    const carp = document.getElementById('vm_carpentier').value;
+    lines.push(`Regurgitación mitral ${g[vmGrado]||vmGrado}${carp?' (Carpentier tipo '+carp+')':''}.`);
+  }
+  if (!isNaN(vmArea)) {
+    if (vmArea<1.0) lines.push(`Estenosis mitral severa (área ${vmArea} cm²).`);
+    else if(vmArea<1.5) lines.push(`Estenosis mitral moderada (área ${vmArea} cm²).`);
+    else if(vmArea<2.0) lines.push(`Estenosis mitral leve (área ${vmArea} cm²).`);
+  }
+
+  // 7. VA
+  const vaGmax  = parseFloat(document.getElementById('va_gmax').value);
+  const vaAva   = document.getElementById('va_ava_val')?.textContent?.replace(' cm²','');
+  const vaRaGr  = document.getElementById('va_ra_grado').value;
+  if (!isNaN(vaGmax) && vaGmax > 25) {
+    const sev = document.getElementById('va_ea_sev')?.textContent;
+    lines.push(`${sev&&sev!=='—'?sev:'Estenosis aórtica'} (Gmax ${vaGmax} mmHg${vaAva&&vaAva!=='—'?', AVA '+vaAva+' cm²':''}).`);
+  }
+  if (vaRaGr && vaRaGr!=='' && vaRaGr!=='0') {
+    const g = {1:'leve',2:'moderada',3:'moderada-severa',4:'severa'};
+    lines.push(`Regurgitación aórtica ${g[vaRaGr]||vaRaGr}.`);
+  }
+
+  // 8. Aorta
+  const aoSen = parseFloat(document.getElementById('ao_senos').value);
+  const aoAsc = parseFloat(document.getElementById('ao_ascendente').value);
+  const aoDis = document.getElementById('ao_diseccion').value;
+  if (aoDis !== 'no') lines.push(`⚠ DISECCIÓN AÓRTICA ${aoDis.toUpperCase()} — evaluación urgente.`);
+  else {
+    if (!isNaN(aoSen) && aoSen > 40) lines.push(`Dilatación de senos de Valsalva (${aoSen} mm).`);
+    if (!isNaN(aoAsc) && aoAsc > 40) lines.push(`Dilatación de aorta ascendente (${aoAsc} mm).`);
+  }
+
+  // 9. Pericardio
+  const perDer  = document.getElementById('per_derrame').value;
+  const perTamp = document.getElementById('per_tamponade').value;
+  if (perTamp !== 'no') lines.push(`⚠ TAMPONAMIENTO CARDÍACO — pericardiocentesis urgente.`);
+  else if (perDer !== 'no') {
+    const sz = document.getElementById('per_tamano').value;
+    lines.push(`Derrame pericárdico ${perDer}${sz?' ('+sz+' mm)':''}.`);
+  }
+
+  // 10. GLS VI
+  const glsVI = parseFloat(document.getElementById('str_gls_vi').value);
+  if (!isNaN(glsVI)) {
+    if (glsVI > -18) {
+      const sev = glsVI>-12?'severa':glsVI>-16?'moderada':'leve';
+      lines.push(`Reducción ${sev} del strain longitudinal global del VI (GLS ${glsVI}%, referencia ≤−18%).`);
+    } else {
+      lines.push(`Strain longitudinal global del VI conservado (GLS ${glsVI}%).`);
+    }
+  }
+
+  // 11. RVLS VD
+  const rvls = parseFloat(document.getElementById('str_rvls_libre').value);
+  if (!isNaN(rvls) && rvls > -20) lines.push(`Reducción del strain longitudinal del VD (RVLS pared libre ${rvls}%, referencia ≤−20%).`);
+
+  // 12. HP probabilidad
+  const hpProb = document.getElementById('hp_probabilidad')?.textContent;
+  if (hpProb && hpProb !== '—') {
+    const vIT2   = document.getElementById('vt_vel_it').value;
+    const psap2  = document.getElementById('vt_psap_val')?.textContent || '—';
+    if (hpProb.includes('ALTA'))
+      lines.push(`⚠ Probabilidad ALTA de hipertensión pulmonar (ESC/ERS 2022). Vel IT ${vIT2} m/s, PSAP ${psap2}. Se recomienda cateterismo cardíaco derecho.`);
+    else if (hpProb.includes('INT'))
+      lines.push(`Probabilidad INTERMEDIA de hipertensión pulmonar (ESC/ERS 2022). Vel IT ${vIT2} m/s, PSAP ${psap2}. Evaluación complementaria recomendada.`);
+  }
+
+  // 13. Hallazgos adicionales
+  const extra = document.getElementById('hall_texto').value.trim();
+  if (extra) lines.push('\n' + extra);
+
+  if (lines.length === 0) lines.push('Sin hallazgos significativos documentados en el presente estudio.');
+  document.getElementById('conclusionesText').value = lines.join('\n');
+  setTimeout(() => scrollToSection('sConc'), 200);
+}
+
+function clearConclusions() { document.getElementById('conclusionesText').value = ''; }
+
+// ============================================================
+// EXPORT PDF
+// ============================================================
+function exportPDF() {
+  updatePatientDisplay();
+
+  // ── Helper to get a field value or '—' ──────────────────────────────────
+  const fv  = id => { const e = document.getElementById(id); return (e && e.value && e.value.trim() !== '') ? e.value.trim() : '—'; };
+  const fc  = id => { const e = document.getElementById(id); return (e && e.textContent && e.textContent.trim() !== '' && e.textContent.trim() !== '—') ? e.textContent.trim() : '—'; };
+  const sel = id => { const e = document.getElementById(id); return (e && e.selectedIndex > 0) ? e.options[e.selectedIndex].text : '—'; };
+
+  // ── Build table rows ─────────────────────────────────────────────────────
+  function trow(label, val, unit) {
+    if (val === '—' || val === '' || val == null) return '';
+    return `<tr><td class="pr-label">${label}</td><td class="pr-val">${val}${unit ? ' <span class="pr-unit">'+unit+'</span>' : ''}</td></tr>`;
+  }
+  function thead(title) {
+    return `<tr class="pr-thead"><td colspan="2">${title}</td></tr>`;
+  }
+
+  // ── TABLE DATA ────────────────────────────────────────────────────────────
+  let tableRows = '';
+
+  // Datos del paciente
+  const scv   = fc('sc_val').replace(' m²','');
+  const imcv  = fc('imc_val').replace(' kg/m²','');
+  tableRows += thead('Datos del Paciente');
+  tableRows += trow('Nombre', fv('p_nombre'), '');
+  const expIdTipoEl = document.getElementById('p_id_tipo');
+  const expIdTipo   = expIdTipoEl && expIdTipoEl.selectedIndex > 0 ? expIdTipoEl.options[expIdTipoEl.selectedIndex].value : '';
+  const expIdNum    = fv('p_id_num');
+  if (expIdTipo && expIdNum !== '—') tableRows += trow(expIdTipo, expIdNum, '');
+  else if (expIdNum !== '—') tableRows += trow('Identificación', expIdNum, '');
+  tableRows += trow('Edad', fv('p_edad'), 'años');
+  tableRows += trow('Sexo', sel('p_sexo'), '');
+  tableRows += trow('Fecha', fv('p_fecha'), '');
+  tableRows += trow('Indicación', fv('p_indicacion'), '');
+  tableRows += trow('SC (Du Bois)', scv !== '—' ? scv : '—', 'm²');
+  tableRows += trow('IMC', imcv !== '—' ? imcv : '—', 'kg/m²');
+
+  // Calidad técnica
+  tableRows += thead('Calidad Técnica');
+  tableRows += trow('Ventana', sel('ct_ventana'), '');
+  tableRows += trow('Ritmo', sel('ct_ritmo'), '');
+  tableRows += trow('FC', fv('ct_fc'), 'lpm');
+
+  // VI
+  tableRows += thead('Ventrículo Izquierdo');
+  tableRows += trow('DDVI', fv('vi_ddvi'), 'mm');
+  tableRows += trow('DSVI', fv('vi_dsvi'), 'mm');
+  tableRows += trow('SIV', fv('vi_siv'), 'mm');
+  tableRows += trow('PP', fv('vi_pp'), 'mm');
+  tableRows += trow('FEVI', fv('vi_fevi'), '%');
+  tableRows += trow('VTD', fv('vi_vtd'), 'mL');
+  tableRows += trow('VTS', fv('vi_vts'), 'mL');
+  tableRows += trow('FA', fc('vi_fa_val').replace(' %',''), '%');
+  tableRows += trow('Masa VI', fc('vi_masa_val').replace(' g',''), 'g');
+  tableRows += trow('Masa VI indexada', fc('vi_masai_val').replace(' g/m²',''), 'g/m²');
+  tableRows += trow('IRP', fc('vi_irp_val'), '');
+  tableRows += trow('Patrón geométrico', fc('vi_patron_val'), '');
+
+  // Segmentarios VI
+  const segRowsExp = getSegRows().filter(r => r.mot && r.ter);
+  if (segRowsExp.length > 0) {
+    const motLabelsExp = {
+      hipo_leve:'Hipocinesia leve', hipo_mod:'Hipocinesia moderada',
+      hipo_sev:'Hipocinesia severa', hipo_glob:'Hipocinesia global',
+      acinesia:'Acinesia', discinesia:'Discinesia', aneurisma:'Aneurisma segmentario'
+    };
+    tableRows += thead('Trastornos Segmentarios');
+    segRowsExp.forEach((r, i) => {
+      const label = (motLabelsExp[r.mot]||r.mot) + ' — ' + r.ter + (r.ext?' ('+r.ext+')':'');
+      tableRows += trow('Alteración ' + (i+1), label, '');
+    });
+  }
+
+  // Diastólica
+  tableRows += thead('Función Diastólica');
+  tableRows += trow('Onda E', fv('dia_E'), 'm/s');
+  tableRows += trow('Onda A', fv('dia_A'), 'm/s');
+  tableRows += trow('Relación E/A', fc('dia_ea_val'), '');
+  tableRows += trow('TDE', fv('dia_tde'), 'ms');
+  tableRows += trow("e' septal", fv('dia_eprime_sep'), 'cm/s');
+  tableRows += trow("e' lateral", fv('dia_eprime_lat'), 'cm/s');
+  tableRows += trow("E/e' medio", fc('dia_ee_val'), '');
+  tableRows += trow('T-TRIV', fv('dia_triv'), 'ms');
+  tableRows += trow('Grado diastólico', fc('dia_grado'), '');
+
+  // AI
+  tableRows += thead('Aurícula Izquierda');
+  tableRows += trow('Diámetro AP', fv('ai_diam'), 'mm');
+  tableRows += trow('Volumen AI', fv('ai_vol'), 'mL');
+  tableRows += trow('Volumen indexado', fc('ai_voli_val').replace(' mL/m²',''), 'mL/m²');
+
+  // VD
+  tableRows += thead('Ventrículo Derecho');
+  tableRows += trow('TAPSE', fv('vd_tapse'), 'mm');
+  tableRows += trow('FAC', fv('vd_fac'), '%');
+  tableRows += trow("S' TDI", fv('vd_sprime'), 'cm/s');
+  tableRows += trow('Diámetro basal', fv('vd_diam'), 'mm');
+  tableRows += trow('Diámetro medio', fv('vd_diam_medio'), 'mm');
+  tableRows += trow('Diámetro longitudinal', fv('vd_diam_long'), 'mm');
+  tableRows += trow('Grosor pared libre', fv('vd_grosor'), 'mm');
+
+  // AD
+  const adAreaV  = fv('ad_area');
+  const adDiamV  = fv('ad_diam_mayor');
+  const adTamV   = fc('ad_tamano_val');
+  if (adAreaV !== '—' || adDiamV !== '—') {
+    tableRows += thead('Aurícula Derecha');
+    tableRows += trow('Área AD', adAreaV, 'cm²');
+    tableRows += trow('Diámetro mayor', adDiamV, 'mm');
+    tableRows += trow('Diámetro menor', fv('ad_diam_menor'), 'mm');
+    tableRows += trow('Tamaño', adTamV, '');
+    tableRows += trow('Morfología', sel('ad_morfologia'), '');
+    tableRows += trow('Trombo/masa', sel('ad_trombo'), '');
+    tableRows += trow('CIA / FOP', sel('ad_cia'), '');
+  }
+
+  // VM
+  tableRows += thead('Válvula Mitral');
+  tableRows += trow('Morfología', sel('vm_morfologia'), '');
+  tableRows += trow('Área VM (PHT)', fv('vm_area_pht'), 'cm²');
+  tableRows += trow('PHT', fv('vm_pht'), 'ms');
+  tableRows += trow('Grad. medio VM', fv('vm_gmedio'), 'mmHg');
+  tableRows += trow('Grado RM', sel('vm_rm_grado'), '/IV');
+  tableRows += trow('Carpentier', sel('vm_carpentier'), '');
+  tableRows += trow('ERO', fv('vm_ero'), 'cm²');
+  tableRows += trow('Vol. regurgitante', fv('vm_volreg'), 'mL');
+
+  // VA
+  tableRows += thead('Válvula Aórtica');
+  tableRows += trow('Morfología', sel('va_morfologia'), '');
+  tableRows += trow('Gmax', fv('va_gmax'), 'mmHg');
+  tableRows += trow('Gmedio', fv('va_gmedio'), 'mmHg');
+  tableRows += trow('VTI TSVI', fv('va_vti_tsvi'), 'cm');
+  tableRows += trow('VTI Ao', fv('va_vti_ao'), 'cm');
+  tableRows += trow('Diám. TSVI', fv('va_dtsvi'), 'mm');
+  tableRows += trow('AVA (continuidad)', fc('va_ava_val').replace(' cm²',''), 'cm²');
+  tableRows += trow('Grado RA', sel('va_ra_grado'), '/IV');
+  tableRows += trow('Ancho chorro/TSVI', fv('va_ra_ratio'), '%');
+  tableRows += trow('PHT aórtico', fv('va_pht_ra'), 'ms');
+
+  // VT
+  tableRows += thead('Válvula Tricúspide');
+  tableRows += trow('Morfología', sel('vt_morfologia'), '');
+  tableRows += trow('Vel. IT pico', fv('vt_vel_it'), 'm/s');
+  tableRows += trow('Grado IT', sel('vt_it_grado'), '/IV');
+  tableRows += trow('PAD estimada', sel('vt_pad'), 'mmHg');
+  tableRows += trow('PSAP estimada', fc('vt_psap_val').replace(' mmHg',''), 'mmHg');
+
+  // VP
+  tableRows += thead('Válvula Pulmonar');
+  tableRows += trow('Morfología', sel('vp_morfologia'), '');
+  tableRows += trow('Vel. flujo', fv('vp_vel'), 'm/s');
+  tableRows += trow('Grad. medio', fv('vp_gmedio'), 'mmHg');
+  tableRows += trow('Regurgitación', sel('vp_rp'), '');
+
+  // Aorta
+  tableRows += thead('Aorta y Grandes Vasos');
+  tableRows += trow('Anillo aórtico', fv('ao_anillo'), 'mm');
+  tableRows += trow('Senos de Valsalva', fv('ao_senos'), 'mm');
+  tableRows += trow('Unión sinotubular', fv('ao_ust'), 'mm');
+  tableRows += trow('Aorta ascendente', fv('ao_ascendente'), 'mm');
+  tableRows += trow('Arco aórtico', fv('ao_arco'), 'mm');
+  tableRows += trow('Aorta desc. proximal', fv('ao_desc'), 'mm');
+  tableRows += trow('Disección', sel('ao_diseccion'), '');
+
+  // AP / VCI
+  tableRows += thead('Arteria Pulmonar / VCI');
+  tableRows += trow('Tronco AP', fv('ap_diam'), 'mm');
+  tableRows += trow('VCI diámetro', fv('vci_diam'), 'mm');
+  tableRows += trow('Colapso VCI', sel('vci_colapso'), '');
+  tableRows += trow('PAD estimada', fc('vci_pad_val').replace(' mmHg',''), 'mmHg');
+
+  // Pericardio
+  tableRows += thead('Pericardio');
+  tableRows += trow('Derrame', sel('per_derrame'), '');
+  tableRows += trow('Tamaño', fv('per_tamano'), 'mm');
+  tableRows += trow('Localización', sel('per_loc'), '');
+  tableRows += trow('Tamponamiento', sel('per_tamponade'), '');
+
+  // Strain
+  const glsV  = fv('str_gls_vi');
+  const rvlsL = fv('str_rvls_libre');
+  const rvlsG = fv('str_rvls_global');
+  if (glsV !== '—' || rvlsL !== '—' || rvlsG !== '—') {
+    tableRows += thead('Strain Ventricular');
+    tableRows += trow('GLS VI', glsV, '%');
+    tableRows += trow('RVLS pared libre', rvlsL, '%');
+    tableRows += trow('RVLS global', rvlsG, '%');
+    tableRows += trow('Software', sel('str_software_vi'), '');
+  }
+
+  // HP
+  const hpProb = fc('hp_probabilidad');
+  if (hpProb !== '—') {
+    tableRows += thead('Prob. Hipertensión Pulmonar (ESC/ERS 2022)');
+    tableRows += trow('Probabilidad', hpProb, '');
+    tableRows += trow('Criterio', fc('hp_criterio_aplicado'), '');
+    tableRows += trow('TAPSE/PSAP', fc('hp_tapse_psap'), 'mm/mmHg');
+    tableRows += trow('AP/Ao ratio', fc('hp_ap_ao_ratio'), '');
+  }
+
+  // ── TEXT SECTIONS ─────────────────────────────────────────────────────────
+  const textSections = [
+    { id: 'ct_texto',  title: 'Calidad Técnica y Ritmo' },
+    { id: 'vi_texto',  title: 'Ventrículo Izquierdo' },
+    { id: 'dia_texto', title: 'Función Diastólica' },
+    { id: 'ai_texto',  title: 'Aurícula Izquierda' },
+    { id: 'vd_texto',  title: 'Ventrículo Derecho' },
+    { id: 'ad_texto',  title: 'Aurícula Derecha' },
+    { id: 'vm_texto',  title: 'Válvula Mitral' },
+    { id: 'va_texto',  title: 'Válvula Aórtica' },
+    { id: 'vt_texto',  title: 'Válvula Tricúspide' },
+    { id: 'vp_texto',  title: 'Válvula Pulmonar' },
+    { id: 'ao_texto',  title: 'Aorta y Grandes Vasos' },
+    { id: 'ap_texto',  title: 'Arteria Pulmonar y VCI' },
+    { id: 'per_texto', title: 'Pericardio' },
+    { id: 'str_texto', title: 'Strain Ventricular' },
+    { id: 'hp_texto',  title: 'Hipertensión Pulmonar' },
+    { id: 'hall_texto',title: 'Hallazgos Adicionales' },
+  ];
+
+  let textBlocks = '';
+  textSections.forEach(sec => {
+    const el = document.getElementById(sec.id);
+    if (el && el.value && el.value.trim() !== '') {
+      textBlocks += `<div class="pr-text-block">
+        <div class="pr-text-title">${sec.title}</div>
+        <div class="pr-text-body">${el.value.trim().replace(/\n/g,'<br>')}</div>
+      </div>`;
+    }
+  });
+
+  // Conclusiones
+  const concEl = document.getElementById('conclusionesText');
+  const concText = concEl && concEl.value.trim();
+  const concBlock = concText
+    ? `<div class="pr-conclusions"><div class="pr-conc-title">■ CONCLUSIONES</div><div class="pr-conc-body">${concText.replace(/\n/g,'<br>')}</div></div>`
+    : '';
+
+  // ── PRINT HEADER ──────────────────────────────────────────────────────────
+  const logoSrc = localStorage.getItem('eco_logo') || '';
+  const pNombre = fv('p_nombre');
+  const pEdad   = fv('p_edad');
+  const pSexo   = sel('p_sexo');
+  const pFecha  = fv('p_fecha');
+  const pIndic  = fv('p_indicacion');
+  const pSolic  = fv('p_solicitante');
+  const pIdTipoEl = document.getElementById('p_id_tipo');
+  const pIdTipo   = pIdTipoEl && pIdTipoEl.selectedIndex > 0 ? pIdTipoEl.options[pIdTipoEl.selectedIndex].value : '';
+  const pIdNum    = fv('p_id_num');
+
+  // ── ASSEMBLE PRINT DIV ────────────────────────────────────────────────────
+  const printDiv = document.createElement('div');
+  printDiv.id = 'pr-layout';
+  printDiv.innerHTML = `
+    <div class="pr-header">
+      ${logoSrc ? `<img src="${logoSrc}" class="pr-logo">` : ''}
+      <div class="pr-header-right">
+        <div class="pr-report-title">INFORME ECOCARDIOGRÁFICO</div>
+        <div class="pr-doctor" id="config-pr-doctor"></div>
+      </div>
+    </div>
+    <div class="pr-line"></div>
+    <div class="pr-patient-row">
+      ${pNombre !== '—' ? `<span><b>Paciente:</b> ${pNombre}</span>` : ''}
+      ${pIdTipo && pIdNum !== '—' ? `<span><b>${pIdTipo}:</b> ${pIdNum}</span>` : (pIdNum !== '—' ? `<span><b>ID:</b> ${pIdNum}</span>` : '')}
+      ${pEdad !== '—'   ? `<span><b>Edad:</b> ${pEdad} años</span>` : ''}
+      ${pSexo !== '—'   ? `<span><b>Sexo:</b> ${pSexo}</span>` : ''}
+      ${pFecha !== '—'  ? `<span><b>Fecha:</b> ${pFecha}</span>` : ''}
+      ${pIndic !== '—'  ? `<span><b>Indicación:</b> ${pIndic}</span>` : ''}
+      ${pSolic !== '—'  ? `<span><b>Solicitante:</b> ${pSolic}</span>` : ''}
+    </div>
+    <div class="pr-line" style="margin-bottom:10pt;"></div>
+
+    <div class="pr-body">
+      <div class="pr-col-table">
+        <table class="pr-table">
+          <tbody>${tableRows}</tbody>
+        </table>
+      </div>
+      <div class="pr-col-text">
+        ${textBlocks}
+      </div>
+    </div>
+
+    ${concBlock}
+  `;
+  document.body.appendChild(printDiv);
+
+  // Fill dynamic config elements inside pr-layout
+  const cfg2 = JSON.parse(localStorage.getItem('eco_config') || 'null') || { name: 'Dr. Nombre Apellido', specialty: 'Especialidad' };
+  const logo2 = localStorage.getItem('eco_logo') || '';
+  const prDoc = document.getElementById('config-pr-doctor');
+  if (prDoc) prDoc.textContent = cfg2.name + ' · ' + (cfg2.specialty.split('·')[0].trim());
+  const prLogo2 = document.querySelector('#pr-layout .pr-logo');
+  if (prLogo2 && logo2) prLogo2.src = logo2;
+
+  window.print();
+
+  setTimeout(() => {
+    const el = document.getElementById('pr-layout');
+    if (el) el.remove();
+  }, 2000);
+}
+
+
+// ============================================================
+// CLEAR ALL
+// ============================================================
+function clearAll() {
+  if (!confirm('¿Iniciar un nuevo informe? Se perderán todos los datos actuales.')) return;
+  document.querySelectorAll('.field-input,.field-textarea').forEach(el => {
+    el.value = ''; el.classList.remove('status-normal','status-warn','status-alert');
+  });
+  document.querySelectorAll('.field-select').forEach(el => el.selectedIndex = 0);
+  document.querySelectorAll('.field-status-text').forEach(el => el.innerHTML = '');
+  document.querySelectorAll('.calc-value').forEach(el => el.textContent = '—');
+  document.querySelectorAll('.section-badge').forEach(b => { b.className='section-badge badge-empty'; b.textContent='—'; });
+  document.querySelectorAll('.nav-dot').forEach(d => d.style.background = '');
+  ['sc_val','imc_val'].forEach(id => document.getElementById(id).textContent = '— m²');
+  document.getElementById('imc_val').textContent = '— kg/m²';
+  ['dia_ea_val','dia_ee_val','dia_grado'].forEach(id => document.getElementById(id).textContent = '—');
+  document.getElementById('dia_criterios').textContent = 'Ninguno';
+  ['ai_voli_val','ai_estado_val','vi_fa_val','vi_masa_val','vi_masai_val','vi_irp_val','vi_patron_val',
+   'va_ava_val','va_ea_sev','vt_psap_val','vci_pad_val'].forEach(id => document.getElementById(id).textContent = '—');
+  ['str_gls_patron','str_gls_interp','str_rvls_interp'].forEach(id => {
+    const el = document.getElementById(id); if(el){el.textContent='—';el.style.color='';}
+  });
+  // Reset AD
+  ['ad_area','ad_diam_mayor','ad_diam_menor'].forEach(id => {
+    const el = document.getElementById(id); if(el){el.value='';el.classList.remove('status-normal','status-warn','status-alert');}
+  });
+  ['ad_morfologia','ad_trombo','ad_dispositivo','ad_cia'].forEach(id => {
+    const el = document.getElementById(id); if(el) el.selectedIndex=0;
+  });
+  ['ad_tamano_val'].forEach(id => { const el=document.getElementById(id); if(el) el.textContent='—'; });
+  const adStEl = document.getElementById('st_ad_area'); if(adStEl) adStEl.innerHTML='';
+  const adTa = document.getElementById('ad_texto'); if(adTa) adTa.value='';
+  ['hp_a1','hp_a2','hp_a3','hp_a4','hp_b1','hp_b2','hp_b3','hp_b4','hp_c1','hp_c2','hp_c3','hp_c4'].forEach(id => {
+    const el = document.getElementById(id); if(el) el.checked = false;
+  });
+  const pEl = document.getElementById('hp_probabilidad');
+  if(pEl){pEl.textContent='—';pEl.style.color='';}
+  ['hp_vel_display','hp_categorias','hp_criterio_aplicado'].forEach(id => {
+    const el=document.getElementById(id); if(el) el.textContent='—';
+  });
+  ['hp_tapse_psap','hp_ap_ao_ratio'].forEach(id=>{
+    const el=document.getElementById(id);if(el){el.textContent='—';el.style.color='';}
+  });
+  // Reset ID fields
+  const idNumEl = document.getElementById('p_id_num'); if(idNumEl) idNumEl.value='';
+  const idTipoEl2 = document.getElementById('p_id_tipo'); if(idTipoEl2) idTipoEl2.selectedIndex=0;
+  document.getElementById('conclusionesText').value = '';
+  sc = null;
+  clearSegRows();
+}
+
+
+// ============================================================
+// TRASTORNOS SEGMENTARIOS DE LA CONTRACTILIDAD
+// ============================================================
+const SEG_MOTILIDAD_OPTS = [
+  {v:'',         t:'— Tipo'},
+  {v:'hipo_leve',t:'Hipocinesia leve'},
+  {v:'hipo_mod', t:'Hipocinesia moderada'},
+  {v:'hipo_sev', t:'Hipocinesia severa'},
+  {v:'hipo_glob',t:'Hipocinesia global'},
+  {v:'acinesia',  t:'Acinesia'},
+  {v:'discinesia',t:'Discinesia'},
+  {v:'aneurisma', t:'Aneurisma segmentario'},
+];
+const SEG_TERRITORIO_OPTS = [
+  {v:'',               t:'— Territorio'},
+  {v:'anterior (DA)',  t:'Anterior (DA)'},
+  {v:'lateral (CX)',   t:'Lateral (CX)'},
+  {v:'inferior (CD)',  t:'Inferior (CD)'},
+  {v:'septal',         t:'Septal'},
+  {v:'anteroseptal (DA)', t:'Anteroseptal (DA)'},
+  {v:'inferolateral (CX/CD)', t:'Inferolateral (CX/CD)'},
+  {v:'apical',         t:'Apical'},
+  {v:'inferoapical',   t:'Inferoapical'},
+  {v:'anteroapical',   t:'Anteroapical'},
+  {v:'multiterritorial',t:'Multiterritorial'},
+];
+const SEG_EXTENSION_OPTS = [
+  {v:'',           t:'— Extensión'},
+  {v:'1 segmento', t:'1 segmento'},
+  {v:'2 segmentos',t:'2 segmentos'},
+  {v:'3 segmentos',t:'3 segmentos'},
+  {v:'4 o más segmentos',t:'4 o más segmentos'},
+  {v:'difusa (>50% del VI)',t:'Difusa (>50% del VI)'},
+];
+
+let segRowCount = 0;
+
+function makeSelect(opts, cls) {
+  const s = document.createElement('select');
+  s.className = 'field-select';
+  s.style.fontSize = '12px';
+  s.style.padding = '5px 8px';
+  opts.forEach(o => {
+    const op = document.createElement('option');
+    op.value = o.v; op.textContent = o.t;
+    s.appendChild(op);
+  });
+  s.addEventListener('change', updateSegSummary);
+  return s;
+}
+
+function addSegRow() {
+  const container = document.getElementById('seg-rows');
+  if (!container) return;
+  segRowCount++;
+  const row = document.createElement('div');
+  row.id = 'seg-row-' + segRowCount;
+  row.style.cssText = 'display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:6px;margin-bottom:6px;align-items:center;';
+
+  const selMot = makeSelect(SEG_MOTILIDAD_OPTS, 'seg-mot');
+  const selTer = makeSelect(SEG_TERRITORIO_OPTS, 'seg-ter');
+  const selExt = makeSelect(SEG_EXTENSION_OPTS, 'seg-ext');
+
+  const delBtn = document.createElement('button');
+  delBtn.className = 'btn btn-ghost no-print';
+  delBtn.textContent = '✕';
+  delBtn.style.cssText = 'padding:4px 10px;font-size:12px;color:var(--text3);min-width:32px;';
+  delBtn.onclick = () => { row.remove(); updateSegSummary(); updateSectionBadge('s2'); };
+
+  row.appendChild(selMot);
+  row.appendChild(selTer);
+  row.appendChild(selExt);
+  row.appendChild(delBtn);
+  container.appendChild(row);
+  updateSegSummary();
+}
+
+function getSegRows() {
+  const rows = [];
+  document.querySelectorAll('#seg-rows > div').forEach(row => {
+    const sels = row.querySelectorAll('select');
+    if (sels.length >= 2) {
+      const mot = sels[0].value;
+      const ter = sels[1].value;
+      const ext = sels[2]?.value || '';
+      if (mot || ter) rows.push({mot, ter, ext});
+    }
+  });
+  return rows;
+}
+
+function updateSegSummary() {
+  const rows = getSegRows();
+  const sumEl = document.getElementById('seg-summary');
+  if (!sumEl) return;
+  const filled = rows.filter(r => r.mot && r.ter);
+  if (filled.length === 0) {
+    sumEl.textContent = 'Sin alteraciones registradas';
+  } else {
+    sumEl.textContent = filled.length + ' alteración' + (filled.length > 1 ? 'es' : '') + ' registrada' + (filled.length > 1 ? 's' : '');
+  }
+  updateSectionBadge('s2');
+}
+
+function loadSegPreformat() {
+  const rows = getSegRows().filter(r => r.mot && r.ter);
+  const ta = document.getElementById('vi_texto');
+  if (!ta) return;
+
+  if (rows.length === 0) {
+    // No rows — generate "sin alteraciones" text
+    ta.value = 'No se identifican trastornos segmentarios de la contractilidad. Todos los segmentos miocárdicos conservan motilidad y engrosamiento sistólico normales.';
+    ta.style.height = 'auto';
+    ta.style.height = Math.max(ta.scrollHeight, 80) + 'px';
+    return;
+  }
+
+  const fevi = document.getElementById('vi_fevi')?.value || '___';
+
+  // Group by motility type for a natural combined description
+  const grupos = {};
+  rows.forEach(r => {
+    if (!grupos[r.mot]) grupos[r.mot] = [];
+    grupos[r.mot].push({ter: r.ter, ext: r.ext});
+  });
+
+  const motLabels = {
+    hipo_leve:  'hipocinesia leve',
+    hipo_mod:   'hipocinesia moderada',
+    hipo_sev:   'hipocinesia severa',
+    hipo_glob:  'hipocinesia global',
+    acinesia:   'acinesia',
+    discinesia: 'discinesia',
+    aneurisma:  'aneurisma segmentario',
+  };
+
+  const partes = [];
+  Object.entries(grupos).forEach(([mot, segs]) => {
+    const label = motLabels[mot] || mot;
+    const territorios = segs.map(s => {
+      let t = s.ter;
+      if (s.ext) t += ' (' + s.ext + ')';
+      return t;
+    });
+    if (territorios.length === 1) {
+      partes.push(label + ' en el territorio ' + territorios[0]);
+    } else {
+      const last = territorios.pop();
+      partes.push(label + ' en los territorios ' + territorios.join(', ') + ' y ' + last);
+    }
+  });
+
+  let texto = 'Se identifican trastornos segmentarios de la contractilidad: ';
+  if (partes.length === 1) {
+    texto += partes[0] + '.';
+  } else {
+    const lastParte = partes.pop();
+    texto += partes.join('; ') + '; y ' + lastParte + '.';
+  }
+
+  // Add preserved segments note
+  texto += ' El resto de los segmentos miocárdicos conservan motilidad y engrosamiento sistólico normales.';
+  texto += ' FEVI global ' + fevi + '% por Simpson biplano.';
+  texto += ' Los hallazgos son compatibles con cardiopatía isquémica en los territorios comprometidos.';
+
+  ta.value = texto;
+  ta.style.height = 'auto';
+  ta.style.height = Math.max(ta.scrollHeight, 80) + 'px';
+}
+
+function clearSegRows() {
+  const container = document.getElementById('seg-rows');
+  if (container) container.innerHTML = '';
+  segRowCount = 0;
+  updateSegSummary();
+}
+
+// ============================================================
+// INIT
+// ============================================================
+document.addEventListener('DOMContentLoaded', () => {
+  const d = document.getElementById('p_fecha');
+  if (d) d.value = new Date().toISOString().split('T')[0];
+  addSegRow(); // start with one empty row
+  document.querySelectorAll('.field-textarea').forEach(ta => {
+    ta.addEventListener('input', function() {
+      this.style.height = 'auto';
+      this.style.height = Math.max(this.scrollHeight, 80) + 'px';
+    });
+  });
+  document.querySelectorAll('.field-input,.field-select,.field-textarea').forEach(el => {
+    el.addEventListener('change', () => {
+      const sec = el.closest('.section-card');
+      if (sec) updateSectionBadge(sec.id);
+    });
+  });
+});
+
+
+// ============================================================
+// RECONOCIMIENTO DE VOZ — Web Speech API
+// ============================================================
+(function() {
+
+  // ── Field label map (for toast display) ──────────────────────────────────
+  const FIELD_LABELS = {
+    p_edad:'Edad', p_peso:'Peso', p_talla:'Talla', ct_fc:'Frecuencia cardíaca',
+    vi_ddvi:'DDVI', vi_dsvi:'DSVI', vi_siv:'SIV', vi_pp:'PP',
+    vi_fevi:'FEVI', vi_vtd:'VTD', vi_vts:'VTS',
+    dia_E:'Onda E', dia_A:'Onda A', dia_tde:'TDE',
+    dia_eprime_sep:"e' septal", dia_eprime_lat:"e' lateral", dia_triv:'T-TRIV',
+    ai_diam:'Diámetro AI', ai_vol:'Volumen AI',
+    vd_tapse:'TAPSE', vd_fac:'FAC', vd_sprime:"S' TDI",
+    vd_diam:'Diám. basal VD', vd_diam_medio:'Diám. medio VD', vd_diam_long:'Diám. long. VD', vd_grosor:'Grosor pared VD',
+    ad_area:'Área AD', ad_diam_mayor:'Diám. mayor AD', ad_diam_menor:'Diám. menor AD',
+    vm_gmedio:'Grad. medio VM', vm_area_pht:'Área VM', vm_pht:'PHT',
+    vm_ero:'ERO', vm_volreg:'Vol. regurgitante',
+    va_vti_tsvi:'VTI TSVI', va_dtsvi:'Diám. TSVI', va_vti_ao:'VTI Ao',
+    va_gmax:'Gmax', va_gmedio:'Gmedio', va_pht_ra:'PHT Ao', va_ra_ratio:'Chorro/TSVI',
+    vt_vel_it:'Vel. IT', vp_vel:'Vel. VP', vp_gmedio:'Grad. VP',
+    ao_anillo:'Anillo Ao', ao_senos:'Senos Valsalva', ao_ust:'UST',
+    ao_ascendente:'Ao ascendente', ao_arco:'Arco Ao', ao_desc:'Ao desc.',
+    ap_diam:'Tronco AP', vci_diam:'VCI',
+    per_tamano:'Derrame pericard.',
+    str_gls_vi:'GLS VI', str_rvls_global:'RVLS global', str_rvls_libre:'RVLS pared libre',
+    str_radial_vi:'Strain radial', str_circ_vi:'Strain circunf.',
+    str_4ch:'Strain 4C', str_2ch:'Strain 2C', str_3ch:'Strain 3C', str_ai:'Strain AI',
+    hp_exc_idx:'Excursión VD',
+    vd_mpi:'RV MPI',
+  };
+
+  // ── Number parser (Spanish speech → number) ──────────────────────────────
+  function parseSpokenNumber(text) {
+    text = text.toLowerCase().trim();
+
+    // Direct digits or decimals already in text: "45.3", "−18", "menos 18"
+    text = text.replace(/menos\s*/g, '-').replace(/más\s*/g, '').replace(/coma/g, '.').replace(/punto/g, '.');
+
+    // Try direct parse first
+    const direct = parseFloat(text.replace(/[^\d.\-]/g,''));
+    if (!isNaN(direct) && text.match(/^[\-\d\.\s]+$/)) return direct;
+
+    // Word-to-number map (Spanish)
+    const ones = {cero:0,uno:1,una:1,dos:2,tres:3,cuatro:4,cinco:5,seis:6,siete:7,ocho:8,nueve:9,
+                  diez:10,once:11,doce:12,trece:13,catorce:14,quince:15,
+                  dieciséis:16,dieciseis:16,diecisiete:17,dieciocho:18,diecinueve:19,
+                  veinte:20,veintiuno:21,veintidós:22,veintidos:22,veintitrés:23,veintitres:23,
+                  veinticuatro:24,veinticinco:25,veintiséis:26,veintiseis:26,
+                  veintisiete:27,veintiocho:28,veintinueve:29};
+    const tens = {treinta:30,cuarenta:40,cincuenta:50,sesenta:60,setenta:70,ochenta:80,noventa:90};
+
+    let negative = false;
+    if (text.startsWith('-')) { negative = true; text = text.slice(1).trim(); }
+
+    let intPart = null, decPart = null;
+    const parts = text.split(/\s*\.\s*/);
+    const intText = parts[0].trim();
+    if (parts[1] !== undefined) decPart = parts[1].trim();
+
+    // Parse integer part
+    const words = intText.split(/\s+y\s+|\s+/);
+    let total = 0;
+    for (const w of words) {
+      if (ones[w] !== undefined) total += ones[w];
+      else if (tens[w] !== undefined) total += tens[w];
+      else {
+        const n = parseFloat(w); if (!isNaN(n)) total = n;
+      }
+    }
+    intPart = total;
+
+    let result = intPart;
+    if (decPart !== null) {
+      const dn = parseFloat(decPart.split(/\s+/).map(w => ones[w]!==undefined?ones[w]:w).join(''));
+      if (!isNaN(dn)) result = parseFloat(intPart + '.' + decPart.replace(/\D/g, ''));
+    }
+    return negative ? -result : result;
+  }
+
+  // ── Check API availability ────────────────────────────────────────────────
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    window.startMic = function() {
+      alert('Tu navegador no soporta reconocimiento de voz.\nUsa Google Chrome o Microsoft Edge.');
+    };
+    window.toggleGlobalVoice = function() {
+      alert('Reconocimiento de voz no disponible.\nUsa Google Chrome o Microsoft Edge.');
+    };
+    return;
+  }
+
+  let currentRec = null;
+  let currentBtn = null;
+  let globalMode = false;
+  let globalFieldIndex = 0;
+  let globalFields = [];
+
+  // DOM refs resolved after DOMContentLoaded
+  let toast, toastName, toastVal, globalBtn;
+  document.addEventListener('DOMContentLoaded', function() {
+    toast     = document.getElementById('voice-toast');
+    toastName = document.getElementById('vt-field-name');
+    toastVal  = document.getElementById('vt-interim');
+    globalBtn = document.getElementById('voice-global-btn');
+  });
+
+  function showToast(fieldId, interim) {
+    if (!toast) return;
+    const label = FIELD_LABELS[fieldId] || fieldId;
+    toastName.textContent = '🎙 ' + label;
+    toastVal.textContent  = interim || '...';
+    toast.classList.add('show');
+  }
+  function hideToast() { if (toast) toast.classList.remove('show'); }
+
+  function stopCurrent() {
+    if (currentRec) { try { currentRec.stop(); } catch(e){} currentRec = null; }
+    if (currentBtn) { currentBtn.classList.remove('listening'); currentBtn.textContent = '🎙'; currentBtn = null; }
+    hideToast();
+  }
+
+  // ── Single field mic ──────────────────────────────────────────────────────
+  window.startMic = function(fieldId, btn) {
+    if (currentBtn === btn) { stopCurrent(); return; }
+    stopCurrent();
+
+    const input = document.getElementById(fieldId);
+    if (!input) return;
+
+    const rec = new SpeechRecognition();
+    rec.lang = 'es-CO';
+    rec.continuous = false;
+    rec.interimResults = true;
+    rec.maxAlternatives = 3;
+
+    currentRec = rec;
+    currentBtn = btn;
+    btn.classList.add('listening');
+    btn.textContent = '⏹';
+    showToast(fieldId, '...');
+
+    rec.onresult = function(e) {
+      let interim = '', final = '';
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        const t = e.results[i][0].transcript;
+        if (e.results[i].isFinal) final += t;
+        else interim += t;
+      }
+      showToast(fieldId, interim || final || '...');
+      if (final) {
+        const num = parseSpokenNumber(final);
+        if (!isNaN(num)) {
+          input.value = num;
+          input.dispatchEvent(new Event('input', {bubbles:true}));
+          input.dispatchEvent(new Event('change', {bubbles:true}));
+          showToast(fieldId, '✓ ' + num);
+          setTimeout(() => { stopCurrent(); }, 800);
+        } else {
+          showToast(fieldId, '? "' + final + '"');
+          setTimeout(() => { stopCurrent(); }, 1200);
+        }
+      }
+    };
+
+    rec.onerror = function(e) {
+      showToast(fieldId, '✗ Error: ' + e.error);
+      setTimeout(() => { stopCurrent(); }, 1200);
+    };
+
+    rec.onend = function() {
+      if (currentRec === rec) stopCurrent();
+    };
+
+    rec.start();
+  };
+
+  // ── Global sequential voice mode ─────────────────────────────────────────
+  window.toggleGlobalVoice = function() {
+    if (globalMode) {
+      stopGlobalMode();
+    } else {
+      startGlobalMode();
+    }
+  };
+
+  function startGlobalMode() {
+    globalFields = Array.from(document.querySelectorAll('.field-input[type="number"]'))
+      .filter(el => el.offsetParent !== null);
+    if (globalFields.length === 0) return;
+    globalMode = true;
+    globalFieldIndex = 0;
+    if (globalBtn) { globalBtn.classList.add('active'); globalBtn.textContent = '⏹'; }
+    promptNextField();
+  }
+
+  function stopGlobalMode() {
+    globalMode = false;
+    if (globalBtn) { globalBtn.classList.remove('active'); globalBtn.textContent = '🎙'; }
+    stopCurrent();
+    hideToast();
+  }
+
+  function promptNextField() {
+    if (!globalMode) return;
+    // Find next empty field
+    while (globalFieldIndex < globalFields.length && globalFields[globalFieldIndex].value !== '') {
+      globalFieldIndex++;
+    }
+    if (globalFieldIndex >= globalFields.length) {
+      stopGlobalMode();
+      showToast('done', '✓ Completado');
+      setTimeout(hideToast, 2000);
+      return;
+    }
+    const input = globalFields[globalFieldIndex];
+    const fieldId = input.id;
+    const micBtn  = input.parentElement.querySelector('.mic-btn');
+
+    if (currentBtn) { currentBtn.classList.remove('listening'); currentBtn.textContent = '🎙'; }
+    if (micBtn) { micBtn.classList.add('listening'); micBtn.textContent = '⏹'; currentBtn = micBtn; }
+
+    // Scroll into view
+    input.scrollIntoView({behavior:'smooth', block:'center'});
+    input.focus();
+    showToast(fieldId, '...');
+
+    const rec = new SpeechRecognition();
+    rec.lang = 'es-CO';
+    rec.continuous = false;
+    rec.interimResults = true;
+    rec.maxAlternatives = 3;
+    currentRec = rec;
+
+    rec.onresult = function(e) {
+      let interim = '', final = '';
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        const t = e.results[i][0].transcript;
+        if (e.results[i].isFinal) final += t;
+        else interim += t;
+      }
+      showToast(fieldId, interim || final || '...');
+      if (final) {
+        // "saltar" or "siguiente" → skip
+        const lower = final.toLowerCase().trim();
+        if (lower.includes('saltar') || lower.includes('siguiente') || lower.includes('no') || lower.includes('vacío')) {
+          if (micBtn) { micBtn.classList.remove('listening'); micBtn.textContent = '🎙'; }
+          currentBtn = null; currentRec = null;
+          globalFieldIndex++;
+          setTimeout(promptNextField, 400);
+          return;
+        }
+        // "parar" or "detener" → stop
+        if (lower.includes('parar') || lower.includes('detener') || lower.includes('terminar')) {
+          stopGlobalMode();
+          return;
+        }
+        const num = parseSpokenNumber(final);
+        if (!isNaN(num)) {
+          input.value = num;
+          input.dispatchEvent(new Event('input', {bubbles:true}));
+          input.dispatchEvent(new Event('change', {bubbles:true}));
+          showToast(fieldId, '✓ ' + num);
+          if (micBtn) { micBtn.classList.remove('listening'); micBtn.textContent = '🎙'; }
+          currentBtn = null; currentRec = null;
+          globalFieldIndex++;
+          setTimeout(promptNextField, 600);
+        } else {
+          showToast(fieldId, '? "' + final + '" — repita');
+          setTimeout(() => { if (globalMode) { rec.start(); } }, 600);
+        }
+      }
+    };
+
+    rec.onerror = function(e) {
+      if (e.error === 'no-speech') {
+        // silently skip after no speech
+        if (micBtn) { micBtn.classList.remove('listening'); micBtn.textContent = '🎙'; }
+        currentBtn = null; currentRec = null;
+        globalFieldIndex++;
+        if (globalMode) setTimeout(promptNextField, 300);
+      } else {
+        showToast(fieldId, '✗ ' + e.error);
+        setTimeout(() => { stopGlobalMode(); }, 1500);
+      }
+    };
+
+    rec.onend = function() {
+      // handled by onresult or onerror
+    };
+
+    rec.start();
+  }
+
+})();
+
+
+// ============================================================
+// CONFIGURACIÓN DEL MÉDICO — localStorage
+// ============================================================
+const CONFIG_KEY = 'eco_config';
+const LOGO_KEY   = 'eco_logo';
+
+// Default values (original doctor)
+const DEFAULT_CONFIG = {
+  name:      'Dr. Nombre Apellido',
+  specialty: 'Especialidad · Informe Ecocardiográfico'
+};
+
+function applyConfig() {
+  const cfg  = JSON.parse(localStorage.getItem(CONFIG_KEY) || 'null') || DEFAULT_CONFIG;
+  const logo = localStorage.getItem(LOGO_KEY) || '';
+
+  // Header
+  const nameEl = document.getElementById('config-name-display');
+  const specEl = document.getElementById('config-specialty-display');
+  if (nameEl) nameEl.textContent = cfg.name;
+  if (specEl) specEl.textContent = cfg.specialty;
+
+  // Header logo
+  const headerLogo = document.getElementById('config-logo-img');
+  if (headerLogo) headerLogo.src = logo;
+
+  // Print header
+  const printName = document.getElementById('config-print-name');
+  const printDoc  = document.getElementById('config-print-doctor');
+  const printLogo = document.getElementById('config-print-logo');
+  if (printName) printName.textContent = 'INFORME ECOCARDIOGRÁFICO';
+  if (printDoc)  printDoc.textContent  = cfg.name + ' · ' + cfg.specialty.split('·')[0].trim();
+  if (printLogo && logo) printLogo.src = logo;
+
+  // exportPDF uses logoSrc from localStorage (already wired)
+  // Update page title
+  document.title = 'Informe Ecocardiográfico — ' + cfg.name;
+}
+
+function openConfig() {
+  const cfg  = JSON.parse(localStorage.getItem(CONFIG_KEY) || 'null') || DEFAULT_CONFIG;
+  const logo = localStorage.getItem(LOGO_KEY) || '';
+
+  document.getElementById('cfg-name').value      = cfg.name;
+  document.getElementById('cfg-specialty').value = cfg.specialty;
+
+  // Preview
+  updateLogoPreview(logo);
+
+  const overlay = document.getElementById('config-modal-overlay');
+  overlay.classList.remove('hidden');
+
+  // Hide cancel only on first run (no config saved yet)
+  const isFirstRun = !localStorage.getItem(CONFIG_KEY);
+  document.getElementById('cfg-cancel-btn').style.display = isFirstRun ? 'none' : '';
+}
+
+function closeConfig() {
+  document.getElementById('config-modal-overlay').classList.add('hidden');
+}
+
+function saveConfig() {
+  const name      = document.getElementById('cfg-name').value.trim();
+  const specialty = document.getElementById('cfg-specialty').value.trim();
+
+  if (!name) {
+    document.getElementById('cfg-name').focus();
+    document.getElementById('cfg-name').style.borderColor = 'var(--red)';
+    return;
+  }
+  document.getElementById('cfg-name').style.borderColor = '';
+
+  const cfg = { name, specialty: specialty || 'Médico' };
+  localStorage.setItem(CONFIG_KEY, JSON.stringify(cfg));
+
+  applyConfig();
+  closeConfig();
+}
+
+function handleLogoUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const dataUrl = e.target.result;
+    localStorage.setItem(LOGO_KEY, dataUrl);
+    updateLogoPreview(dataUrl);
+  };
+  reader.readAsDataURL(file);
+  // Reset input so same file can be re-selected
+  event.target.value = '';
+}
+
+function updateLogoPreview(dataUrl) {
+  const preview = document.getElementById('config-logo-preview');
+  const placeholder = document.getElementById('cfg-logo-placeholder');
+  const removeBtn   = document.getElementById('cfg-remove-btn');
+  if (dataUrl) {
+    preview.innerHTML = `<img src="${dataUrl}" style="max-width:100%;max-height:100%;object-fit:contain;">`;
+    if (removeBtn) removeBtn.style.display = '';
+  } else {
+    preview.innerHTML = '<span id="cfg-logo-placeholder">Sin logo</span>';
+    if (removeBtn) removeBtn.style.display = 'none';
+  }
+}
+
+function removeLogo() {
+  localStorage.removeItem(LOGO_KEY);
+  updateLogoPreview('');
+  const headerLogo = document.getElementById('config-logo-img');
+  if (headerLogo) headerLogo.src = '';
+  const printLogo = document.getElementById('config-print-logo');
+  if (printLogo) printLogo.src = '';
+}
+
+// ── On load: apply config or show modal if first run ────────────────────────
+document.addEventListener('DOMContentLoaded', function() {
+  const isFirstRun = !localStorage.getItem(CONFIG_KEY);
+  applyConfig();
+  if (isFirstRun) {
+    // Small delay so the app renders first
+    setTimeout(openConfig, 300);
+  }
+});
+
+
+
+
+// ── STRESS ECHO JS ───────────────────────────────────────────────────
+const SEGMENTS_16=['Bas ant','Bas antlat','Bas inflat','Bas inf','Bas infmed','Bas antmed',
+  'Med ant','Med antlat','Med inflat','Med inf','Med infmed','Med antmed',
+  'Ap ant','Ap lat','Ap inf','Ap med'];
+const WM_OPTS=[{v:'NK',l:'NK'},{v:'HKL',l:'HKl'},{v:'HKM',l:'HKm'},{v:'HKS',l:'HKs'},{v:'AK',l:'AK'},{v:'DK',l:'DK'}];
+const WM_VIAB=[{v:'NK',l:'NK'},{v:'HKL',l:'HKl'},{v:'HKM',l:'HKm'},{v:'AK',l:'AK'},{v:'MEJ',l:'MEJ'},{v:'BIF',l:'BIF'},{v:'DK',l:'DK'}];
+
+function buildWMGrid(cid,stage){
+  const c=document.getElementById(cid); if(!c)return;
+  const opts=stage==='bajo'?WM_VIAB:WM_OPTS;
+  c.innerHTML=SEGMENTS_16.map((seg,i)=>'<div class="wm-segment" id="wms-'+stage+'-'+i+'"><div class="wm-seg-name">'+seg+'</div><select class="wm-seg-select" onchange="updateWMColor(\''+stage+'\','+i+',this.value)">'+opts.map(o=>'<option value="'+o.v+'">'+o.l+'</option>').join('')+'</select></div>').join('');
+}
+function updateWMColor(stage,idx,val){
+  const el=document.getElementById('wms-'+stage+'-'+idx); if(!el)return;
+  el.className='wm-segment';
+  if(val==='NK')el.classList.add('wm-normal');
+  else if(val.startsWith('HK'))el.classList.add('wm-hipo');
+  else if(val==='AK')el.classList.add('wm-aki');
+  else if(val==='DK')el.classList.add('wm-dis');
+  else if(val==='BIF'||val==='MEJ')el.classList.add('wm-bif');
+}
+function showStage(stage){
+  document.querySelectorAll('.stage-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.stage-tab').forEach(t=>t.classList.remove('active'));
+  const panel=document.getElementById('panel-'+stage); if(panel)panel.classList.add('active');
+  document.querySelectorAll('.stage-tab').forEach(t=>{if(t.dataset.stage===stage)t.classList.add('active');});
+}
+function calcFCMax(){
+  const edad=parseFloat(document.getElementById('p_edad').value);
+  const el=document.getElementById('fc_max_val');
+  if(!isNaN(edad)&&edad>0){const fcm=Math.round(220-edad);el.textContent=fcm+' lpm';el.dataset.fcmax=fcm;}
+  else{el.textContent='— lpm';el.dataset.fcmax='';}
+  calcAdecuacion();
+}
+function calcAdecuacion(){
+  const fcMaxEl=document.getElementById('fc_max_val');
+  const fcPico=parseFloat(document.getElementById('hr_pico')?.value||0);
+  const fcMax=parseFloat(fcMaxEl?.dataset?.fcmax||0);
+  const adecEl=document.getElementById('es_adecuacion_val');
+  const dispEl=document.getElementById('adecuacion_display');
+  if(fcPico>0&&fcMax>0){
+    const pct=Math.round((fcPico/fcMax)*100);
+    if(adecEl)adecEl.textContent=pct+'%';
+    const bpEl=document.getElementById('bp_pico');
+    if(bpEl&&bpEl.value){const syst=parseInt(bpEl.value.split('/')[0]);if(!isNaN(syst)){const rppEl=document.getElementById('rpp_val');if(rppEl)rppEl.textContent=(fcPico*syst).toLocaleString();}}
+    const msg=pct>=85?'✓ Test adecuado (≥85% FC máx.)':pct>=75?'⚠ Test subóptimo (75-84%)':'✗ Test inadecuado (<75%)';
+    if(dispEl){dispEl.textContent=msg;dispEl.style.color=pct>=85?'#10b981':pct>=75?'#f59e0b':'var(--red)';}
+  }else{if(adecEl)adecEl.textContent='—';}
+}
+function calcEE(stage){
+  const E=parseFloat(document.getElementById('dia_E_'+stage)?.value||0);
+  const esep=parseFloat(document.getElementById('eprime_sep_'+stage)?.value||0);
+  const elat=parseFloat(document.getElementById('eprime_lat_'+stage)?.value||0);
+  const out=document.getElementById('ee_'+stage+'_val'); if(!out)return;
+  if(E>0&&(esep>0||elat>0)){const ep=(esep>0&&elat>0)?(esep+elat)/2:(esep||elat);const ee=((E*100)/ep).toFixed(1);out.textContent=ee;out.style.color=parseFloat(ee)>15?'var(--red)':'var(--text2)';}
+  else out.textContent='—';
+}
+function calcPSAP(stage){
+  const ids={reposo:'vt_vel_it_reposo',bajo:'vt_vel_it_bajo',pico:'vt_vel_it_pico',rec:'vt_vel_it_rec'};
+  const velEl=document.getElementById(ids[stage]); const outEl=document.getElementById('psap_'+stage+'_val');
+  if(!velEl||!outEl)return;
+  const v=parseFloat(velEl.value);
+  if(!isNaN(v)&&v>0){const psap=Math.round(4*v*v+5);outEl.textContent=psap+' mmHg';outEl.style.color=psap>50?'var(--red)':psap>35?'#f59e0b':'var(--text2)';}
+  else outEl.textContent='—';
+}
+function interpretWMSI(stage){
+  const el=document.getElementById('wmsi_'+stage);
+  const out=document.getElementById('wmsi_'+stage+'_interp')||document.getElementById('wmsi_'+stage+'_vs');
+  if(!el||!out)return;
+  const v=parseFloat(el.value); if(isNaN(v)){out.textContent='—';return;}
+  const txt=v===1.0?'Normal':v<=1.5?'Leve':v<=2.0?'Moderado':v<=2.5?'Mod-sev':'Severo';
+  out.textContent=v.toFixed(1)+' — '+txt;
+  const basalEl=document.getElementById('wmsi_reposo');
+  if(stage!=='reposo'&&basalEl&&basalEl.value){
+    const diff=v-parseFloat(basalEl.value);
+    if(diff>0.2){out.textContent+=' ↑';out.style.color='var(--red)';}
+    else if(diff<-0.2){out.textContent+=' ↓';out.style.color='#10b981';}
+    else out.style.color='var(--text3)';
+  }
+}
+function calcFEVIDelta(){
+  const basal=parseFloat(document.getElementById('vi_fevi')?.value||0);
+  const pico=parseFloat(document.getElementById('vi_fevi_pico')?.value||0);
+  const el=document.getElementById('fevi_delta_val'); if(!el)return;
+  if(basal>0&&pico>0){const d=Math.round(pico-basal);el.textContent=(d>=0?'+':'')+d+'%';el.style.color=d>=5?'#10b981':d<=-5?'var(--red)':'var(--text3)';}
+  else el.textContent='—';
+}
+function updateProtocol(){
+  const tipo=document.getElementById('es_tipo')?.value||'';
+  const isDob=tipo.includes('dobutamina');
+  const lbl=document.getElementById('bajo-label'); if(lbl)lbl.textContent=isDob?'🟡 Baja dosis Dobutamina (5-10 mcg/kg/min)':'🟡 Bajo esfuerzo (25-50W / etapa 1)';
+  const dob=document.getElementById('dob_bajo_section'); if(dob)dob.style.display=isDob?'':'none';
+  document.querySelectorAll('.stage-tab').forEach(t=>{if(t.dataset.stage==='bajo')t.textContent=isDob?'🟡 Baja dosis':'🟡 Bajo esfuerzo';});
+}
+const STRESS_PF={
+  stress_reposo_normal:'En reposo: FEVI {vi_fevi}%, motilidad segmentaria normal (WMSI {wmsi_reposo}). Sin alteraciones de la contractilidad en reposo.',
+  stress_reposo_wma:'En reposo: FEVI {vi_fevi}%, WMSI {wmsi_reposo}. Alteraciones de la motilidad segmentaria en reposo.',
+  stress_bajo_normal:'Bajo esfuerzo/baja dosis: sin cambios en motilidad (WMSI {wmsi_bajo}). Sin isquemia a esta carga.',
+  stress_bajo_mejoria:'Baja dosis dobutamina: mejoría de contractilidad segmentaria — RESERVA CONTRÁCTIL / VIABILIDAD MIOCÁRDICA. WMSI {wmsi_bajo}.',
+  stress_bajo_bifasico:'Baja dosis: respuesta bifásica (mejoría inicial con deterioro posterior a alta dosis). Compatible con MIOCARDIO HIBERNANTE. WMSI {wmsi_bajo}.',
+  stress_bajo_isquemia:'Bajo esfuerzo: nuevas WMA — UMBRAL ISQUÉMICO BAJO. WMSI {wmsi_bajo} vs. basal {wmsi_reposo}.',
+  stress_pico_normal:'Pico: sin isquemia inducible. Motilidad normal en todos los segmentos. FEVI {vi_fevi_pico}% (Δ{fevi_delta_val}). WMSI {wmsi_pico}. PSAP {psap_pico_val}.',
+  stress_pico_isquemia:'Pico: ISQUEMIA MIOCÁRDICA INDUCIBLE — nuevas WMA (WMSI {wmsi_pico} vs. basal {wmsi_reposo}). FEVI {vi_fevi_pico}% (Δ{fevi_delta_val}). PSAP {psap_pico_val}.',
+  stress_pico_dsf_diastolica:'Pico: DISFUNCIÓN DIASTÓLICA INDUCIDA POR ESFUERZO — E/e\' {ee_pico_val} (>15). PSAP {psap_pico_val}. FEVI {vi_fevi_pico}% preservada.',
+  stress_pico_hp_esfuerzo:'Pico: PSAP {psap_pico_val} — HIPERTENSIÓN PULMONAR INDUCIBLE POR EJERCICIO. E/e\' {ee_pico_val}.',
+  stress_rec_normal:'Recuperación: normalización completa de la motilidad. WMSI {wmsi_rec}. FC {hr_rec} lpm.',
+  stress_rec_wma_persist:'Recuperación: WMA persistente (WMSI {wmsi_rec}). Compatible con miocardio aturdido post-isquémico.',
+  stress_concl_negativo:'ECOCARDIOGRAMA DE ESTRÉS NEGATIVO PARA ISQUEMIA. Test adecuado ({es_adecuacion_val} de FC máx.). Sin nuevas WMA en ninguna etapa. FEVI pico {vi_fevi_pico}%. WMSI {wmsi_pico}. Sin evidencia de isquemia por imagen.',
+  stress_concl_isquemia_1v:'ECOCARDIOGRAMA DE ESTRÉS POSITIVO — ISQUEMIA en territorio {res_territorio}. Nueva WMA en pico (WMSI {wmsi_pico} vs. basal {wmsi_reposo}). Normalización {wma_normalizacion} en recuperación. Compatible con EAC obstructiva.',
+  stress_concl_isquemia_ext:'ECOCARDIOGRAMA DE ESTRÉS POSITIVO — ISQUEMIA EXTENSA/MULTIVASO. Múltiples territorios con WMA inducibles (WMSI {wmsi_pico} vs. {wmsi_reposo}). Estudio de ALTO RIESGO. Se recomienda coronariografía.',
+  stress_concl_viabilidad:'VIABILIDAD MIOCÁRDICA (Dobutamina): Reserva contráctil / respuesta bifásica en segmentos disfuncionantes. MIOCARDIO HIBERNANTE VIABLE. Potencial beneficio de revascularización. FEVI basal {vi_fevi}%.',
+  stress_concl_dsf:'Sin isquemia por imagen. DISFUNCIÓN DIASTÓLICA INDUCIDA POR ESFUERZO: E/e\' {ee_pico_val} en pico, PSAP {psap_pico_val}. Hallazgos que pueden explicar la disnea de esfuerzo.',
+};
+function loadPreformatStress(taId,key){
+  const ta=document.getElementById(taId); if(!ta)return;
+  let text=STRESS_PF[key]||'';
+  const repl={
+    vi_fevi:document.getElementById('vi_fevi')?.value||'—',
+    vi_fevi_pico:document.getElementById('vi_fevi_pico')?.value||'—',
+    wmsi_reposo:document.getElementById('wmsi_reposo')?.value||'—',
+    wmsi_bajo:document.getElementById('wmsi_bajo')?.value||'—',
+    wmsi_pico:document.getElementById('wmsi_pico')?.value||'—',
+    wmsi_rec:document.getElementById('wmsi_rec')?.value||'—',
+    ee_pico_val:document.getElementById('ee_pico_val')?.textContent||'—',
+    psap_reposo_val:document.getElementById('psap_reposo_val')?.textContent||'—',
+    psap_pico_val:document.getElementById('psap_pico_val')?.textContent||'—',
+    fevi_delta_val:document.getElementById('fevi_delta_val')?.textContent||'—',
+    es_adecuacion_val:document.getElementById('es_adecuacion_val')?.textContent||'—',
+    hr_rec:document.getElementById('hr_rec')?.value||'—',
+    res_territorio:(()=>{const e=document.getElementById('res_territorio');return e&&e.selectedIndex>0?e.options[e.selectedIndex].text:'—';})(),
+    wma_normalizacion:(()=>{const e=document.getElementById('wma_normalizacion');return e?e.options[e.selectedIndex].text:'—';})(),
+  };
+  Object.keys(repl).forEach(k=>{text=text.replace(new RegExp('\\{'+k+'\\}','g'),repl[k]);});
+  ta.value=text;ta.style.height='auto';ta.style.height=Math.max(ta.scrollHeight,80)+'px';
+}
+const _origRC=window.recalcAll;
+window.recalcAll=function(){
+  if(_origRC)_origRC();
+  calcFCMax();calcAdecuacion();
+  calcEE('reposo');calcEE('pico');
+  calcPSAP('reposo');calcPSAP('bajo');calcPSAP('pico');calcPSAP('rec');
+  calcFEVIDelta();
+};
+document.addEventListener('DOMContentLoaded',function(){
+  buildWMGrid('wm-reposo','reposo');
+  buildWMGrid('wm-bajo','bajo');
+  buildWMGrid('wm-pico','pico');
+  updateProtocol();
+  const d=document.getElementById('p_fecha');if(d&&!d.value)d.value=new Date().toISOString().split('T')[0];
+});
+
+</script>
+</body>
+</html>
