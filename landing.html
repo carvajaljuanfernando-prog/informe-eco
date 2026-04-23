@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sistema de Informes Ecocardiográficos</title>
+<style>
+
+  :root{--bg:#0f1117;--surface:#171b26;--surface2:#1e2332;--surface3:#252a3a;--border:#2d3348;--border2:#3a4060;--accent:#4f9cf9;--accent2:#3b82f6;--green:#22c55e;--green-bg:rgba(34,197,94,.08);--yellow:#eab308;--yellow-bg:rgba(234,179,8,.08);--red:#ef4444;--red-bg:rgba(239,68,68,.08);--text:#e2e8f0;--text2:#94a3b8;--text3:#64748b;--radius:6px;--font:-apple-system,BlinkMacSystemFont,'Segoe UI','Helvetica Neue',Arial,sans-serif;--mono:'SF Mono','Fira Code','Consolas','Courier New',monospace}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:13px;line-height:1.5;min-height:100vh}
+  .app-header{background:var(--surface);border-bottom:1px solid var(--border);padding:10px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+  .app-logo{display:flex;align-items:center;gap:10px}
+  .app-logo-text{font-size:13px;font-weight:600;color:var(--text)}
+  .app-logo-sub{font-size:11px;color:var(--text3);font-weight:300}
+  .header-actions{display:flex;gap:8px;align-items:center}
+  .app-body{display:grid;grid-template-columns:220px 1fr;min-height:calc(100vh - 53px)}
+  .sidebar{background:var(--surface);border-right:1px solid var(--border);padding:14px 0;position:sticky;top:53px;height:calc(100vh - 53px);overflow-y:auto}
+  .sidebar::-webkit-scrollbar{width:4px}
+  .sidebar::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+  .nav-section-label{padding:4px 16px 5px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--text3)}
+  .nav-item{display:flex;align-items:center;gap:8px;padding:6px 16px;cursor:pointer;color:var(--text2);font-size:12px;border-left:2px solid transparent;transition:all .15s;text-decoration:none}
+  .nav-item:hover{background:var(--surface2);color:var(--text)}
+  .nav-item.active{background:rgba(79,156,249,.08);color:var(--accent);border-left-color:var(--accent);font-weight:500}
+  .nav-dot{width:6px;height:6px;border-radius:50%;background:var(--border2);flex-shrink:0}
+  .nav-divider{height:1px;background:var(--border);margin:7px 0}
+  .main-content{padding:20px;overflow-y:auto;max-width:1100px}
+  .section-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;margin-bottom:14px;overflow:hidden}
+  .section-header{display:flex;align-items:center;justify-content:space-between;padding:11px 16px;cursor:pointer;user-select:none;background:var(--surface2);border-bottom:1px solid var(--border);transition:background .15s}
+  .section-header:hover{background:var(--surface3)}
+  .section-title-row{display:flex;align-items:center;gap:10px}
+  .section-num{font-family:var(--mono);font-size:10px;color:var(--text3);background:var(--surface3);padding:2px 6px;border-radius:3px;min-width:26px;text-align:center}
+  .section-title{font-size:13px;font-weight:600;color:var(--text)}
+  .section-badge{font-size:10px;padding:1px 7px;border-radius:20px;font-weight:500}
+  .badge-normal{background:var(--green-bg);color:var(--green)}
+  .badge-warn{background:var(--yellow-bg);color:var(--yellow)}
+  .badge-alert{background:var(--red-bg);color:var(--red)}
+  .badge-empty{background:var(--surface3);color:var(--text3)}
+  .section-chevron{color:var(--text3);transition:transform .2s;font-size:12px}
+  .section-card.collapsed .section-chevron{transform:rotate(-90deg)}
+  .section-card.collapsed .section-body{display:none}
+  .section-body{padding:16px}
+  .field-grid{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));margin-bottom:12px}
+  .field-grid-2{grid-template-columns:repeat(2,1fr)}
+  .field-grid-3{grid-template-columns:repeat(3,1fr)}
+  .field-grid-4{grid-template-columns:repeat(4,1fr)}
+  .field-grid-6{grid-template-columns:repeat(6,1fr)}
+  .field-group{display:flex;flex-direction:column;gap:3px}
+  .field-label{font-size:10px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.04em}
+  .field-input-wrap{position:relative}
+  .field-input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:var(--mono);font-size:13px;padding:6px 10px;outline:none;transition:border-color .15s,background .15s}
+  .field-input:focus{border-color:var(--accent);background:var(--surface3)}
+  .field-input.status-normal{border-color:rgba(34,197,94,.4);background:var(--green-bg)}
+  .field-input.status-warn{border-color:rgba(234,179,8,.4);background:var(--yellow-bg)}
+  .field-input.status-alert{border-color:rgba(239,68,68,.4);background:var(--red-bg)}
+  .field-unit{position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:10px;color:var(--text3);pointer-events:none}
+  .field-status-text{font-size:10px;margin-top:2px}
+  .status-normal-txt{color:var(--green)}
+  .status-warn-txt{color:var(--yellow)}
+  .status-alert-txt{color:var(--red)}
+  .field-select{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:var(--font);font-size:13px;padding:6px 10px;outline:none;cursor:pointer;transition:border-color .15s}
+  .field-select:focus{border-color:var(--accent)}
+  .field-textarea{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:var(--font);font-size:12px;padding:8px 12px;outline:none;resize:vertical;min-height:80px;line-height:1.6;transition:border-color .15s}
+  .field-textarea:focus{border-color:var(--accent)}
+  .calc-value{background:rgba(79,156,249,.06);border:1px solid rgba(79,156,249,.2);border-radius:var(--radius);padding:6px 10px;font-family:var(--mono);font-size:13px;color:var(--accent);display:flex;align-items:center;min-height:32px}
+  .subsection-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);border-bottom:1px solid var(--border);padding-bottom:5px;margin-bottom:11px;margin-top:15px}
+  .subsection-title:first-child{margin-top:0}
+  .derived-panel{background:rgba(79,156,249,.04);border:1px solid rgba(79,156,249,.12);border-radius:var(--radius);padding:10px 14px;margin-bottom:12px;display:flex;flex-wrap:wrap;gap:12px}
+  .derived-item{display:flex;flex-direction:column;gap:2px}
+  .derived-item-label{font-size:10px;color:var(--text3);text-transform:uppercase}
+  .derived-item-val{font-family:var(--mono);font-size:13px;color:var(--accent);font-weight:500}
+  .preformat-bar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;align-items:center}
+  .preformat-label{font-size:10px;color:var(--text3);font-weight:500;text-transform:uppercase;letter-spacing:.04em}
+  .preformat-btn{font-family:var(--font);font-size:11px;font-weight:500;padding:4px 10px;border-radius:20px;border:1px solid var(--border2);background:var(--surface3);color:var(--text2);cursor:pointer;transition:all .15s}
+  .preformat-btn:hover{background:var(--surface2);color:var(--text);border-color:var(--accent)}
+  .pf-normal{border-color:rgba(34,197,94,.3);color:var(--green)}.pf-normal:hover{background:var(--green-bg)}
+  .pf-leve{border-color:rgba(234,179,8,.3);color:var(--yellow)}.pf-leve:hover{background:var(--yellow-bg)}
+  .pf-moderado{border-color:rgba(249,115,22,.3);color:#f97316}.pf-moderado:hover{background:rgba(249,115,22,.08)}
+  .pf-severo{border-color:rgba(239,68,68,.3);color:var(--red)}.pf-severo:hover{background:var(--red-bg)}
+  .btn{font-family:var(--font);font-size:12px;font-weight:500;padding:7px 16px;border-radius:var(--radius);border:none;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
+  .btn-primary{background:var(--accent2);color:#fff}.btn-primary:hover{background:var(--accent)}
+  .btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border2)}.btn-ghost:hover{background:var(--surface3);color:var(--text)}
+  .btn-lg{padding:9px 22px;font-size:13px}
+  .conclusions-section{background:var(--surface);border:1px solid var(--accent2);border-radius:8px;padding:18px;margin-top:14px}
+  .conclusions-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+  .conclusions-title{font-size:15px;font-weight:700;color:var(--accent);display:flex;align-items:center;gap:8px}
+  .hp-check-label{display:flex;align-items:center;gap:8px;cursor:pointer;padding:7px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);font-size:12px;transition:border-color .15s}
+  .hp-check-label:hover{border-color:var(--accent)}
+  .hp-check-label input{accent-color:var(--accent)}
+  .action-bar{display:flex;gap:8px;padding:14px 24px;background:var(--surface);border-top:1px solid var(--border);position:sticky;bottom:0;z-index:50}
+  .mt-8{margin-top:8px}.mt-12{margin-top:12px}
+  input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
+  input[type=number]{-moz-appearance:textfield}
+  ::-webkit-scrollbar{width:6px;height:6px}
+  ::-webkit-scrollbar-track{background:var(--bg)}
+  ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+  .print-header{display:none}
+  @media print{
+    *{box-sizing:border-box}
+    body{background:#fff!important;color:#000!important;font-family:'Times New Roman',serif;font-size:11pt;line-height:1.5;margin:0;padding:0}
+    .app-header,.sidebar,.action-bar,.preformat-bar,.preformat-label,.btn,.section-chevron,.field-status-text,.derived-panel,.no-print{display:none!important}
+    .app-body{display:block!important}
+    .main-content{padding:0!important;max-width:100%!important}
+    .print-header{display:block!important;margin-bottom:14pt}
+    .section-card{background:#fff!important;border:none!important;margin-bottom:10pt!important;page-break-inside:avoid}
+    .section-card.collapsed .section-body{display:block!important}
+    .section-body{padding:0!important}
+    .section-header{display:none!important}
+    .print-section-title{font-size:11pt;font-weight:bold;border-bottom:1pt solid #888;padding-bottom:3pt;margin-bottom:5pt;text-transform:uppercase;letter-spacing:.04em}
+    .field-grid,.field-grid-2,.field-grid-3,.field-grid-4,.field-grid-6{display:flex!important;flex-wrap:wrap!important;gap:4pt!important;margin-bottom:5pt!important}
+    .field-group{min-width:90pt}
+    .field-label{font-size:8pt;font-weight:bold;color:#555}
+    .field-input,.field-select{background:#fff!important;border:none!important;color:#000!important;font-family:inherit!important;font-size:11pt!important;padding:0!important}
+    .field-textarea{background:#fff!important;border:none!important;color:#000!important;font-family:'Times New Roman',serif!important;font-size:11pt!important;padding:0!important;resize:none!important;height:auto!important;min-height:auto!important;overflow:hidden!important}
+    .calc-value{background:none!important;border:none!important;color:#000!important;font-size:11pt!important;padding:0!important}
+    .conclusions-section{background:#fff!important;border:1pt solid #000!important;padding:8pt!important}
+    .conclusions-title{color:#000!important;font-size:12pt!important}
+    #conclusionesText{background:#fff!important;border:none!important;color:#000!important;font-size:11pt!important}
+    .subsection-title{color:#333!important;border-color:#aaa!important;font-size:9pt!important}
+    .hp-check-label{background:#fff!important;border:none!important;font-size:10pt!important;padding:1pt 0!important}
+    /* Strain: ocultar sección completa si no hay texto */
+    .print-hidden{display:none!important}
+    /* Strain: mostrar solo el bloque de texto interpretativo */
+    .print-strain-only .section-body > *:not(.print-section-title):not(#str_texto){display:none!important}
+    .print-strain-only .section-body > #str_texto{display:block!important;background:#fff!important;border:none!important;color:#000!important;font-family:'Times New Roman',serif!important;font-size:11pt!important;padding:0!important;resize:none!important;height:auto!important;min-height:auto!important;overflow:hidden!important}
+  }
+
+  /* ── PRINT REPORT LAYOUT ─────────────────────────────────────── */
+  #pr-layout { display:none }
+  @media print {
+    body > *:not(#pr-layout) { display:none !important }
+    #pr-layout {
+      display:block !important;
+      font-family:'Times New Roman', serif;
+      font-size:9.5pt;
+      color:#000;
+      margin:0;
+      padding:0;
+    }
+
+    /* Header */
+    .pr-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:5pt }
+    .pr-logo { height:54pt; width:auto }
+    .pr-header-right { text-align:right }
+    .pr-report-title { font-size:14pt; font-weight:bold; color:#1a5f7a; letter-spacing:.03em }
+    .pr-doctor { font-size:10pt; color:#1a5f7a; font-weight:600 }
+    .pr-line { border:0; border-top:1.5pt solid #1a5f7a; margin:4pt 0 6pt }
+    .pr-patient-row { display:flex; flex-wrap:wrap; gap:4pt 16pt; font-size:9pt; margin-bottom:4pt }
+    .pr-patient-row span { white-space:nowrap }
+
+    /* Two-column body */
+    .pr-body { display:flex; gap:14pt; align-items:flex-start; margin-bottom:8pt }
+    .pr-col-table { flex:0 0 auto; width:195pt }
+    .pr-col-text  { flex:1 1 0 }
+
+    /* Numeric table */
+    .pr-table { width:100%; border-collapse:collapse; font-size:8.5pt }
+    .pr-table td { padding:1.4pt 4pt; vertical-align:top; line-height:1.35 }
+    .pr-thead td { background:#1a5f7a; color:#fff; font-weight:bold; font-size:7.5pt;
+                   text-transform:uppercase; letter-spacing:.04em; padding:2pt 4pt }
+    .pr-label { color:#333; width:55% }
+    .pr-val   { font-weight:600; color:#000; width:45% }
+    .pr-unit  { font-weight:400; color:#555; font-size:7.5pt }
+    .pr-table tr:nth-child(even):not(.pr-thead) td { background:#f5f7fa }
+
+    /* Text blocks */
+    .pr-text-block { margin-bottom:7pt; page-break-inside:avoid }
+    .pr-text-title { font-size:9pt; font-weight:bold; text-transform:uppercase;
+                     letter-spacing:.05em; border-bottom:.5pt solid #aaa;
+                     padding-bottom:2pt; margin-bottom:3pt; color:#1a5f7a }
+    .pr-text-body  { font-size:9.5pt; line-height:1.55; text-align:justify }
+
+    /* Conclusions */
+    .pr-conclusions { border:1pt solid #1a5f7a; border-radius:3pt; padding:6pt 8pt;
+                      page-break-inside:avoid; margin-top:4pt }
+    .pr-conc-title  { font-size:10pt; font-weight:bold; color:#1a5f7a; margin-bottom:4pt }
+    .pr-conc-body   { font-size:9.5pt; line-height:1.6; text-align:justify }
+  }
+
+  /* ── VOICE RECOGNITION ─────────────────────────────────────── */
+  .mic-btn {
+    position:absolute; right:2px; top:50%; transform:translateY(-50%);
+    width:22px; height:22px; border-radius:50%; border:none; cursor:pointer;
+    background:transparent; color:var(--text3); font-size:12px;
+    display:flex; align-items:center; justify-content:center;
+    transition:all .15s; z-index:2; padding:0;
+  }
+  .mic-btn:hover { color:var(--accent); background:rgba(79,156,249,.1); }
+  .mic-btn.listening {
+    color:#fff !important; background:var(--red) !important;
+    animation: mic-pulse 1s ease-in-out infinite;
+  }
+  @keyframes mic-pulse {
+    0%,100% { box-shadow: 0 0 0 0 rgba(239,68,68,.4); }
+    50%      { box-shadow: 0 0 0 6px rgba(239,68,68,0); }
+  }
+  /* Shift field-unit left when mic present */
+  .has-mic .field-unit { right:26px; }
+
+  /* Voice toast */
+  #voice-toast {
+    position:fixed; bottom:70px; left:50%; transform:translateX(-50%);
+    background:rgba(15,17,23,.95); border:1px solid var(--border2);
+    border-radius:8px; padding:10px 18px; font-size:12px; color:var(--text);
+    display:none; z-index:1000; gap:10px; align-items:center;
+    box-shadow:0 4px 24px rgba(0,0,0,.4); min-width:260px;
+  }
+  #voice-toast.show { display:flex; }
+  #voice-toast .vt-icon { font-size:18px; }
+  #voice-toast .vt-label { color:var(--text3); font-size:11px; }
+  #voice-toast .vt-value { color:var(--accent); font-weight:600; font-size:14px; font-family:var(--mono); }
+
+  /* Global voice button */
+  #voice-global-btn {
+    position:fixed; right:20px; bottom:80px; z-index:200;
+    width:48px; height:48px; border-radius:50%; border:none; cursor:pointer;
+    background:var(--surface2); border:1px solid var(--border2);
+    color:var(--text2); font-size:20px;
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 4px 16px rgba(0,0,0,.3); transition:all .2s;
+  }
+  #voice-global-btn:hover { background:var(--surface3); color:var(--text); }
+  #voice-global-btn.active { background:var(--red); color:#fff; border-color:var(--red);
+    animation: mic-pulse 1s ease-in-out infinite; }
+  #voice-global-btn .vgb-tip {
+    position:absolute; right:56px; white-space:nowrap;
+    background:var(--surface); border:1px solid var(--border2);
+    padding:4px 10px; border-radius:4px; font-size:11px; color:var(--text2);
+    opacity:0; pointer-events:none; transition:opacity .2s;
+  }
+  #voice-global-btn:hover .vgb-tip { opacity:1; }
+
+
+  /* ── CONFIGURACIÓN MÉDICO ───────────────────────────────────── */
+  #config-modal-overlay {
+    position:fixed; inset:0; background:rgba(0,0,0,.7); z-index:2000;
+    display:flex; align-items:center; justify-content:center;
+  }
+  #config-modal-overlay.hidden { display:none; }
+  #config-modal {
+    background:var(--surface); border:1px solid var(--border2);
+    border-radius:12px; padding:32px; width:480px; max-width:95vw;
+    box-shadow:0 16px 48px rgba(0,0,0,.5);
+  }
+  #config-modal h2 {
+    font-size:16px; font-weight:700; color:var(--text); margin-bottom:6px;
+  }
+  #config-modal p.subtitle {
+    font-size:12px; color:var(--text3); margin-bottom:24px; line-height:1.5;
+  }
+  .config-field { margin-bottom:16px; }
+  .config-field label {
+    display:block; font-size:11px; font-weight:600; color:var(--text3);
+    text-transform:uppercase; letter-spacing:.04em; margin-bottom:5px;
+  }
+  .config-field input[type="text"] {
+    width:100%; background:var(--surface2); border:1px solid var(--border);
+    border-radius:var(--radius); color:var(--text); font-size:13px;
+    padding:8px 12px; outline:none; transition:border-color .15s; box-sizing:border-box;
+  }
+  .config-field input[type="text"]:focus { border-color:var(--accent); }
+  .config-logo-area {
+    display:flex; align-items:center; gap:14px; margin-top:6px;
+  }
+  #config-logo-preview {
+    width:80px; height:60px; object-fit:contain;
+    background:var(--surface2); border:1px solid var(--border);
+    border-radius:var(--radius); display:flex; align-items:center;
+    justify-content:center; color:var(--text3); font-size:11px;
+    flex-shrink:0; overflow:hidden;
+  }
+  #config-logo-preview img { max-width:100%; max-height:100%; object-fit:contain; }
+  .config-logo-btns { display:flex; flex-direction:column; gap:6px; }
+  .config-logo-btns button {
+    font-family:var(--font); font-size:11px; font-weight:500;
+    padding:5px 12px; border-radius:var(--radius); border:1px solid var(--border2);
+    background:var(--surface3); color:var(--text2); cursor:pointer; transition:all .15s;
+    text-align:left;
+  }
+  .config-logo-btns button:hover { background:var(--surface2); color:var(--text); }
+  .config-logo-btns button.btn-remove { color:var(--red); border-color:rgba(239,68,68,.3); }
+  .config-modal-actions { display:flex; gap:8px; margin-top:24px; justify-content:flex-end; }
+  /* Settings gear in header */
+  #config-gear-btn {
+    background:transparent; border:1px solid var(--border2); border-radius:var(--radius);
+    color:var(--text3); font-size:14px; padding:5px 9px; cursor:pointer;
+    transition:all .15s; line-height:1;
+  }
+  #config-gear-btn:hover { background:var(--surface3); color:var(--text); }
+
+
+/* ── CONFIGURACIÓN MÉDICO ───────────────────────────────────── */
+  #config-modal-overlay {
+    position:fixed; inset:0; background:rgba(0,0,0,.7); z-index:2000;
+    display:flex; align-items:center; justify-content:center;
+  }
+
+.landing-wrap {
+  min-height:100vh;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;padding:32px 16px;
+}
+.landing-header{text-align:center;margin-bottom:40px;}
+.landing-logo{height:72px;width:auto;margin:0 auto 16px;display:block;}
+.landing-doctor{font-size:20px;font-weight:700;color:var(--text);margin-bottom:4px;}
+.landing-specialty{font-size:13px;color:var(--accent);font-weight:500;}
+.landing-subtitle{font-size:12px;color:var(--text3);margin-top:6px;}
+.studies-grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:20px;width:100%;max-width:920px;margin-bottom:40px;
+}
+.study-card{
+  background:var(--surface);border:1px solid var(--border2);
+  border-radius:16px;padding:28px 24px;cursor:pointer;
+  transition:all .2s ease;text-decoration:none;
+  display:flex;flex-direction:column;align-items:flex-start;
+  gap:10px;position:relative;overflow:hidden;
+}
+.study-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:var(--card-color,var(--accent));border-radius:16px 16px 0 0;
+}
+.study-card:hover{
+  transform:translateY(-4px);
+  border-color:var(--card-color,var(--accent));
+  box-shadow:0 8px 32px rgba(0,0,0,.4);
+}
+.study-icon{font-size:36px;line-height:1;}
+.study-badge{
+  font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;
+  background:var(--card-color,var(--accent));color:#fff;letter-spacing:.06em;
+}
+.study-title{font-size:17px;font-weight:700;color:var(--text);line-height:1.2;}
+.study-desc{font-size:12px;color:var(--text3);line-height:1.6;flex:1;}
+.study-features{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px;}
+.study-feature{
+  font-size:10px;padding:2px 7px;border-radius:10px;
+  background:var(--surface2);color:var(--text3);border:1px solid var(--border);
+}
+.study-arrow{
+  position:absolute;bottom:20px;right:20px;font-size:18px;
+  color:var(--text3);transition:color .2s,transform .2s;
+}
+.study-card:hover .study-arrow{color:var(--card-color,var(--accent));transform:translateX(4px);}
+.study-card.coming-soon{opacity:.5;cursor:not-allowed;pointer-events:none;}
+.coming-badge{
+  font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;
+  background:var(--surface3);color:var(--text3);border:1px solid var(--border2);
+}
+.settings-btn{
+  position:fixed;top:16px;right:16px;
+  background:var(--surface2);border:1px solid var(--border2);
+  border-radius:8px;color:var(--text3);font-size:13px;
+  padding:6px 12px;cursor:pointer;transition:all .15s;z-index:100;
+}
+.settings-btn:hover{background:var(--surface3);color:var(--text);}
+.landing-footer{font-size:11px;color:var(--text3);text-align:center;opacity:.5;}
+@media(max-width:480px){
+  .studies-grid{grid-template-columns:1fr;}
+  .landing-doctor{font-size:17px;}
+}
+</style>
+</head>
+<body>
+
+<!-- ── MODAL CONFIGURACIÓN MÉDICO ── -->
+<div id="config-modal-overlay" class="hidden">
+  <div id="config-modal">
+    <h2>⚙️ Configuración del médico</h2>
+    <p class="subtitle">Esta información aparecerá en el encabezado de todos sus informes.<br>Se guarda en este navegador y no se envía a ningún servidor.</p>
+
+    <div class="config-field">
+      <label>Nombre completo (con título)</label>
+      <input type="text" id="cfg-name" placeholder="Dr. Nombre Apellido">
+    </div>
+    <div class="config-field">
+      <label>Especialidad / Subtítulo</label>
+      <input type="text" id="cfg-specialty" placeholder="Cardiólogo · Informe Ecocardiográfico">
+    </div>
+    <div class="config-field">
+      <label>Logo / Firma</label>
+      <div class="config-logo-area">
+        <div id="config-logo-preview"><span id="cfg-logo-placeholder">Sin logo</span></div>
+        <div class="config-logo-btns">
+          <button onclick="document.getElementById('cfg-logo-input').click()">📁 Cargar imagen...</button>
+          <button class="btn-remove" onclick="removeLogo()" id="cfg-remove-btn" style="display:none">✕ Quitar logo</button>
+          <span style="font-size:10px;color:var(--text3);line-height:1.4;">PNG, JPG o SVG<br>Recomendado: fondo transparente</span>
+        </div>
+      </div>
+      <input type="file" id="cfg-logo-input" accept="image/*" style="display:none" onchange="handleLogoUpload(event)">
+    </div>
+
+    <div class="config-modal-actions">
+      <button class="btn btn-ghost" onclick="closeConfig()" id="cfg-cancel-btn">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveConfig()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<div class="action-bar no-print">
+  <button class="btn btn-primary btn-lg" onclick="exportPDF()">⬇ Exportar PDF</button>
+  <button class="btn btn-ghost" onclick="generateConclusions()">⚡ Generar conclusiones</button>
+  <button class="btn btn-ghost" onclick="clearAll()">🗑 Nuevo informe</button>
+</div>
+
+
+</body>
+</html
+
+<button class="settings-btn" onclick="openConfig()">⚙️ Configurar</button>
+
+<div class="landing-wrap">
+  <div class="landing-header">
+    <img id="config-logo-img" src="" class="landing-logo" alt="Logo" style="display:none;">
+    <div id="config-name-display" class="landing-doctor"></div>
+    <div id="config-specialty-display" class="landing-specialty"></div>
+    <div class="landing-subtitle">Sistema de Informes Ecocardiográficos</div>
+  </div>
+
+  <div class="studies-grid">
+
+    <a class="study-card" href="ttf.html" style="--card-color:#1a7a9e;">
+      <span class="study-icon">🫀</span>
+      <span class="study-badge">TTF</span>
+      <div class="study-title">Ecocardiograma Transtorácico</div>
+      <div class="study-desc">Informe completo con cálculos automáticos ASE/EACVI. Función sistólica, diastólica, valvulopatías y probabilidad de HP.</div>
+      <div class="study-features">
+        <span class="study-feature">17 secciones</span>
+        <span class="study-feature">FEVI · Masa VI</span>
+        <span class="study-feature">Diastólica</span>
+        <span class="study-feature">HP ESC 2022</span>
+        <span class="study-feature">Strain</span>
+      </div>
+      <span class="study-arrow">→</span>
+    </a>
+
+    <a class="study-card" href="informe_ete.html" style="--card-color:#7c3aed;">
+      <span class="study-icon">🔬</span>
+      <span class="study-badge" style="background:#7c3aed;">ETE</span>
+      <div class="study-title">Ecocardiograma Transesofágico</div>
+      <div class="study-desc">Evaluación de orejuela izquierda, tabique interauricular, valvulopatías complejas y aorta torácica completa.</div>
+      <div class="study-features">
+        <span class="study-feature">10 secciones</span>
+        <span class="study-feature">Orejuela LAA</span>
+        <span class="study-feature">FOP · CIA</span>
+        <span class="study-feature">Segmentos VM</span>
+        <span class="study-feature">Aorta torácica</span>
+      </div>
+      <span class="study-arrow">→</span>
+    </a>
+
+    <div class="study-card coming-soon" style="--card-color:#059669;">
+      <span class="study-icon">🏃</span>
+      <span class="coming-badge">Próximamente</span>
+      <div class="study-title">Ecocardiograma de Estrés</div>
+      <div class="study-desc">Ejercicio / dobutamina. Evaluación por etapas: reposo, bajo esfuerzo, pico y recuperación. Viabilidad miocárdica.</div>
+      <div class="study-features">
+        <span class="study-feature">Ejercicio</span>
+        <span class="study-feature">Dobutamina</span>
+        <span class="study-feature">Viabilidad</span>
+        <span class="study-feature">Diastólica esfuerzo</span>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="landing-footer">
+    Versión 2026 · Guías ASE / EACVI / ESC · Uso clínico profesional
+  </div>
+</div>
+
+<script>
+// ============================================================
+// CONFIGURACIÓN DEL MÉDICO — localStorage
+// ============================================================
+const CONFIG_KEY = 'eco_config';
+const LOGO_KEY   = 'eco_logo';
+
+// Default values (original doctor)
+const DEFAULT_CONFIG = {
+  name:      'Dr. Nombre Apellido',
+  specialty: 'Especialidad · Informe Ecocardiográfico'
+};
+
+function applyConfig() {
+  const cfg  = JSON.parse(localStorage.getItem(CONFIG_KEY) || 'null') || DEFAULT_CONFIG;
+  const logo = localStorage.getItem(LOGO_KEY) || '';
+
+  // Header
+  const nameEl = document.getElementById('config-name-display');
+  const specEl = document.getElementById('config-specialty-display');
+  if (nameEl) nameEl.textContent = cfg.name;
+  if (specEl) specEl.textContent = cfg.specialty;
+
+  // Header logo
+  const headerLogo = document.getElementById('config-logo-img');
+  if (headerLogo) headerLogo.src = logo;
+
+  // Print header
+  const printName = document.getElementById('config-print-name');
+  const printDoc  = document.getElementById('config-print-doctor');
+  const printLogo = document.getElementById('config-print-logo');
+  if (printName) printName.textContent = 'INFORME ECOCARDIOGRÁFICO';
+  if (printDoc)  printDoc.textContent  = cfg.name + ' · ' + cfg.specialty.split('·')[0].trim();
+  if (printLogo && logo) printLogo.src = logo;
+
+  // exportPDF uses logoSrc from localStorage (already wired)
+  // Update page title
+  document.title = 'Informe Ecocardiográfico — ' + cfg.name;
+}
+
+function openConfig() {
+  const cfg  = JSON.parse(localStorage.getItem(CONFIG_KEY) || 'null') || DEFAULT_CONFIG;
+  const logo = localStorage.getItem(LOGO_KEY) || '';
+
+  document.getElementById('cfg-name').value      = cfg.name;
+  document.getElementById('cfg-specialty').value = cfg.specialty;
+
+  // Preview
+  updateLogoPreview(logo);
+
+  const overlay = document.getElementById('config-modal-overlay');
+  overlay.classList.remove('hidden');
+
+  // Hide cancel only on first run (no config saved yet)
+  const isFirstRun = !localStorage.getItem(CONFIG_KEY);
+  document.getElementById('cfg-cancel-btn').style.display = isFirstRun ? 'none' : '';
+}
+
+function closeConfig() {
+  document.getElementById('config-modal-overlay').classList.add('hidden');
+}
+
+function saveConfig() {
+  const name      = document.getElementById('cfg-name').value.trim();
+  const specialty = document.getElementById('cfg-specialty').value.trim();
+
+  if (!name) {
+    document.getElementById('cfg-name').focus();
+    document.getElementById('cfg-name').style.borderColor = 'var(--red)';
+    return;
+  }
+  document.getElementById('cfg-name').style.borderColor = '';
+
+  const cfg = { name, specialty: specialty || 'Médico' };
+  localStorage.setItem(CONFIG_KEY, JSON.stringify(cfg));
+
+  applyConfig();
+  closeConfig();
+}
+
+function handleLogoUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const dataUrl = e.target.result;
+    localStorage.setItem(LOGO_KEY, dataUrl);
+    updateLogoPreview(dataUrl);
+  };
+  reader.readAsDataURL(file);
+  // Reset input so same file can be re-selected
+  event.target.value = '';
+}
+
+function updateLogoPreview(dataUrl) {
+  const preview = document.getElementById('config-logo-preview');
+  const placeholder = document.getElementById('cfg-logo-placeholder');
+  const removeBtn   = document.getElementById('cfg-remove-btn');
+  if (dataUrl) {
+    preview.innerHTML = `<img src="${dataUrl}" style="max-width:100%;max-height:100%;object-fit:contain;">`;
+    if (removeBtn) removeBtn.style.display = '';
+  } else {
+    preview.innerHTML = '<span id="cfg-logo-placeholder">Sin logo</span>';
+    if (removeBtn) removeBtn.style.display = 'none';
+  }
+}
+
+function removeLogo() {
+  localStorage.removeItem(LOGO_KEY);
+  updateLogoPreview('');
+  const headerLogo = document.getElementById('config-logo-img');
+  if (headerLogo) headerLogo.src = '';
+  const printLogo = document.getElementById('config-print-logo');
+  if (printLogo) printLogo.src = '';
+}
+
+// ── On load: apply config or show modal if first run ────────────────────────
+document.addEventListener('DOMContentLoaded', function() {
+  const isFirstRun = !localStorage.getItem(CONFIG_KEY);
+  applyConfig();
+  if (isFirstRun) {
+    // Small delay so the app renders first
+    setTimeout(openConfig, 300);
+  }
+});
+
+
+
+// Handle logo visibility
+document.addEventListener('DOMContentLoaded', function() {
+  const logo = document.getElementById('config-logo-img');
+  const storedLogo = localStorage.getItem('eco_logo') || '';
+  if (logo && storedLogo) {
+    logo.src = storedLogo;
+    logo.style.display = 'block';
+  }
+});
+</script>
+</body>
+</html>
